@@ -222,7 +222,7 @@ class SpotifyConnector:
 
         raise Exception("All retries failed!")
 
-    def podcast_metadata(self) -> dict:
+    def metadata(self) -> dict:
         """Loads metadata for podcast.
         
         Args:
@@ -238,7 +238,7 @@ class SpotifyConnector:
         )
         return self._request(url)
 
-    def podcast_streams(
+    def streams(
         self,
         episode_id: str,
         start: dt.date,
@@ -266,7 +266,7 @@ class SpotifyConnector:
         )
         return self._request(url, params=self._date_params(start, end))
 
-    def podcast_listeners(
+    def listeners(
         self,
         episode_id: str,
         start: dt.date,
@@ -294,7 +294,7 @@ class SpotifyConnector:
         )
         return self._request(url, params=self._date_params(start, end))
 
-    def podcast_aggregate(
+    def aggregate(
         self,
         episode_id: str,
         start: dt.date,
@@ -325,7 +325,7 @@ class SpotifyConnector:
     # Create endpoint for retrieving all podcast episodes
     # Example URL: https://generic.wg.spotify.com/podcasters/v0/shows/0WgG3O6LTgbGN5SQmVrNRG/episodes?end=2022-09-13&filter=&page=1&size=50&sortBy=releaseDate&sortOrder=descending&start=2022-09-07
     # We also return a return a cursor for the next page of results
-    def podcast_episodes(
+    def episodes(
         self,
         start: dt.date,
         end: Optional[dt.date] = None,
@@ -382,29 +382,29 @@ if __name__ == "__main__":
     )
 
     # Fetch metadata for podcast
-    metadata = connector.podcast_metadata()
+    metadata = connector.metadata()
     logger.info("Podcast Metadata = {}", json.dumps(metadata, indent=4))
 
     # Fetch stream data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # streams = connector.podcast_streams("48DAya24YOjS7Ez49JSH3y", start, end)
+    # streams = connector.streams("48DAya24YOjS7Ez49JSH3y", start, end)
     # logger.info("Podcast Streams = {}", json.dumps(streams, indent=4))
 
     # Fetch listener data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # listeners = connector.podcast_listeners("48DAya24YOjS7Ez49JSH3y", start, end)
+    # listeners = connector.listeners("48DAya24YOjS7Ez49JSH3y", start, end)
     # logger.info("Podcast Listeners = {}", json.dumps(listeners, indent=4))
 
     # Fetch aggregate data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # aggregate  = connector.podcast_aggregate("48DAya24YOjS7Ez49JSH3y", start, end)
+    # aggregate  = connector.aggregate("48DAya24YOjS7Ez49JSH3y", start, end)
     # logger.info("Podcast Aggregate = {}", json.dumps(aggregate, indent=4))
 
     # Fetch episode data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # episodes = connector.podcast_episodes(start, end)
+    # episodes = connector.episodes(start, end)
     # logger.info("Podcast Episodes = {}", json.dumps(episodes, indent=4))

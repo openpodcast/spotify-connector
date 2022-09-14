@@ -26,14 +26,17 @@ connector = SpotifyConnector(
     refresh_token="your_refresh_token",
 )
 
+# Get podcast metadata
+connector.metadata()
+
 # Get the list of episodes
-episodes = connector.get_episodes()
+episodes = connector.episodes()
 
 # Get the list of listeners
-listeners = connector.get_listeners()
+listeners = connector.listeners()
 
 # Get the list of followers
-followers = connector.get_followers()
+followers = connector.aggregate()
 
 # ...
 ```
