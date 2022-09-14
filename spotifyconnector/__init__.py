@@ -54,10 +54,10 @@ class SpotifyConnector:
             sp_key (str, optional): Spotify cookie.
         """
 
-        self._base_url = base_url
-        self._client_id = client_id
-        self._sp_dc = sp_dc
-        self._sp_key = sp_key
+        self.base_url = base_url
+        self.client_id = client_id
+        self.sp_dc = sp_dc
+        self.sp_key = sp_key
 
         self._bearer: Optional[str] = None
         self._bearer_expires: Optional[dt.datetime] = None
@@ -99,7 +99,7 @@ class SpotifyConnector:
                 "https://accounts.spotify.com/oauth2/v2/auth",
                 params={
                     "response_type": "code",
-                    "client_id": CLIENT_ID,
+                    "client_id": self.client_id,
                     "scope": "streaming ugc-image-upload user-read-email user-read-private",
                     "redirect_uri": "https://podcasters.spotify.com",
                     "code_challenge": code_challenge,
@@ -109,8 +109,8 @@ class SpotifyConnector:
                     "prompt": "none",
                 },
                 cookies={
-                    "sp_dc": SP_DC,
-                    "sp_key": SP_KEY,
+                    "sp_dc": self.sp_dc,
+                    "sp_key": self.sp_key,
                 },
             )
             logger.trace("response - {}", response)
@@ -139,7 +139,7 @@ class SpotifyConnector:
                 "https://accounts.spotify.com/api/token",
                 data={
                     "grant_type": "authorization_code",
-                    "client_id": CLIENT_ID,
+                    "client_id": self.client_id,
                     "code": auth_code,
                     "redirect_uri": "https://podcasters.spotify.com",
                     "code_verifier": code_verifier,
@@ -222,7 +222,7 @@ class SpotifyConnector:
 
         raise Exception("All retries failed!")
 
-    def podcast_metadata(self, podcast_id: str) -> dict:
+    def podcast_metadata(self) -> dict:
         """Loads metadata for podcast.
         
         Args:
@@ -233,7 +233,7 @@ class SpotifyConnector:
         """
         url = self._build_url(
            "shows",
-           podcast_id,
+           self.podcast_id,
            "metadata",
         )
         return self._request(url)
@@ -327,7 +327,6 @@ class SpotifyConnector:
     # We also return a return a cursor for the next page of results
     def podcast_episodes(
         self,
-        podcast_id: str,
         start: dt.date,
         end: Optional[dt.date] = None,
         page: int = 1,
@@ -358,7 +357,7 @@ class SpotifyConnector:
 
         url = self._build_url(
             "shows",
-            podcast_id,
+            self.podcast_id,
             "episodes",
         )
         # return self._request(url, params=self._date_params(start, end))
@@ -367,6 +366,7 @@ class SpotifyConnector:
 
 
 if __name__ == "__main__":
+    # To use the library as a script, fetch the config from the environment
     import os
     BASE_URL = os.environ.get("EXPERIMENTAL_SPOTIFY_BASE_URL")
     CLIENT_ID = os.environ.get("EXPERIMENTAL_SPOTIFY_CLIENT_ID")
@@ -382,7 +382,7 @@ if __name__ == "__main__":
     )
 
     # Fetch metadata for podcast
-    metadata = connector.podcast_metadata(PODCAST_ID)
+    metadata = connector.podcast_metadata()
     logger.info("Podcast Metadata = {}", json.dumps(metadata, indent=4))
 
     # Fetch stream data for podcast
@@ -406,5 +406,5 @@ if __name__ == "__main__":
     # Fetch episode data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # episodes = connector.podcast_episodes("0WgG3O6LTgbGN5SQmVrNRG", start, end)
+    # episodes = connector.podcast_episodes(start, end)
     # logger.info("Podcast Episodes = {}", json.dumps(episodes, indent=4))
