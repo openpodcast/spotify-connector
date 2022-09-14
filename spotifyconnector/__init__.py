@@ -5,7 +5,6 @@ manually by logging in with the appropriate user at podcasters.spotify.com.
 Cookies supposedly last 1 year.
 """
 
-import os
 from typing import Dict, Optional
 import datetime as dt
 from time import sleep
@@ -25,11 +24,6 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
 import yaml
 
-BASE_URL = os.environ.get("EXPERIMENTAL_SPOTIFY_BASE_URL")
-CLIENT_ID = os.environ.get("EXPERIMENTAL_SPOTIFY_CLIENT_ID")
-PODCAST_ID = os.environ.get("EXPERIMENTAL_SPOTIFY_PODCAST_ID")
-SP_DC = os.environ.get("EXPERIMENTAL_SPOTIFY_SP_DC")
-SP_KEY = os.environ.get("EXPERIMENTAL_SPOTIFY_SP_KEY")
 
 DELAY_BASE = 2.0
 
@@ -42,10 +36,29 @@ def random_string(
     return "".join(random.choices(chars, k=length))
 
 
-class ExperimentalSpotifyPodcastAPI:
+class SpotifyConnector:
     """Representation of the experimental Spotify podcast API."""
 
-    def __init__(self):
+    def __init__(self,
+        base_url,
+        client_id,
+        sp_dc,
+        sp_key,
+     ):
+        """Initializes the SpotifyConnector object.
+
+        Args:
+            base_url (str, optional): Base URL for the API. 
+            client_id (str, optional): Spotify Client ID for the API.
+            sp_dc (str, optional): Spotify cookie.
+            sp_key (str, optional): Spotify cookie.
+        """
+
+        self._base_url = base_url
+        self._client_id = client_id
+        self._sp_dc = sp_dc
+        self._sp_key = sp_key
+
         self._bearer: Optional[str] = None
         self._bearer_expires: Optional[dt.datetime] = None
         self._auth_lock = RLock()
@@ -153,9 +166,8 @@ class ExperimentalSpotifyPodcastAPI:
             ):
                 self._authenticate()
 
-    @staticmethod
-    def _build_url(*path: str) -> str:
-        return f"{BASE_URL}/{'/'.join(path)}"
+    def _build_url(self, *path: str) -> str:
+        return f"{self.base_url}/{'/'.join(path)}"
 
     @staticmethod
     def _date_params(start: dt.date, end: dt.date) -> Dict[str, str]:
@@ -355,32 +367,44 @@ class ExperimentalSpotifyPodcastAPI:
 
 
 if __name__ == "__main__":
-    api = ExperimentalSpotifyPodcastAPI()
+    import os
+    BASE_URL = os.environ.get("EXPERIMENTAL_SPOTIFY_BASE_URL")
+    CLIENT_ID = os.environ.get("EXPERIMENTAL_SPOTIFY_CLIENT_ID")
+    PODCAST_ID = os.environ.get("EXPERIMENTAL_SPOTIFY_PODCAST_ID")
+    SP_DC = os.environ.get("EXPERIMENTAL_SPOTIFY_SP_DC")
+    SP_KEY = os.environ.get("EXPERIMENTAL_SPOTIFY_SP_KEY")
+
+    connector = SpotifyConnector(
+        base_url=BASE_URL,
+        client_id=CLIENT_ID,
+        sp_dc=SP_DC,
+        sp_key=SP_KEY,
+    )
 
     # Fetch metadata for podcast
-    # metadata = api.podcast_metadata(PODCAST_ID)
-    # logger.info("Podcast Metadata = {}", json.dumps(metadata, indent=4))
+    metadata = connector.podcast_metadata(PODCAST_ID)
+    logger.info("Podcast Metadata = {}", json.dumps(metadata, indent=4))
 
     # Fetch stream data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # streams = api.podcast_streams("48DAya24YOjS7Ez49JSH3y", start, end)
+    # streams = connector.podcast_streams("48DAya24YOjS7Ez49JSH3y", start, end)
     # logger.info("Podcast Streams = {}", json.dumps(streams, indent=4))
 
     # Fetch listener data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # listeners = api.podcast_listeners("48DAya24YOjS7Ez49JSH3y", start, end)
+    # listeners = connector.podcast_listeners("48DAya24YOjS7Ez49JSH3y", start, end)
     # logger.info("Podcast Listeners = {}", json.dumps(listeners, indent=4))
 
     # Fetch aggregate data for podcast
     # end  = dt.datetime.now()
     # start = dt.datetime.now() - dt.timedelta(days=7)
-    # aggregate  = api.podcast_aggregate("48DAya24YOjS7Ez49JSH3y", start, end)
+    # aggregate  = connector.podcast_aggregate("48DAya24YOjS7Ez49JSH3y", start, end)
     # logger.info("Podcast Aggregate = {}", json.dumps(aggregate, indent=4))
 
     # Fetch episode data for podcast
-    end  = dt.datetime.now()
-    start = dt.datetime.now() - dt.timedelta(days=7)
-    episodes = api.podcast_episodes("0WgG3O6LTgbGN5SQmVrNRG", start, end)
-    logger.info("Podcast Episodes = {}", json.dumps(episodes, indent=4))
+    # end  = dt.datetime.now()
+    # start = dt.datetime.now() - dt.timedelta(days=7)
+    # episodes = connector.podcast_episodes("0WgG3O6LTgbGN5SQmVrNRG", start, end)
+    # logger.info("Podcast Episodes = {}", json.dumps(episodes, indent=4))
