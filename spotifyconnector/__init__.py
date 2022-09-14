@@ -37,7 +37,7 @@ def random_string(
 
 
 class SpotifyConnector:
-    """Representation of the experimental Spotify podcast API."""
+    """Representation of the inofficial Spotify podcast API."""
 
     def __init__(self,
         base_url,
@@ -66,7 +66,7 @@ class SpotifyConnector:
     @retry(wait=wait_exponential(), stop=stop_after_attempt(7))
     def _authenticate(self):
         """
-        Retrieves a Bearer token for the experimental Spotify API, valid 1 hour.
+        Retrieves a Bearer token for the inofficial Spotify API, valid 1 hour.
 
         Generally follows the steps outlined here:
         https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
@@ -74,7 +74,7 @@ class SpotifyConnector:
         """
 
         with self._auth_lock:
-            logger.info("Retrieving Bearer for experimental Spotify API...")
+            logger.info("Retrieving Bearer")
 
             logger.debug("Generating secrets")
 
@@ -211,7 +211,7 @@ class SpotifyConnector:
                 continue
 
             if not response.ok:
-                logger.error("Error in experimental API:")
+                logger.error("Error in API:")
                 logger.info(response.status_code)
                 logger.info(response.headers)
                 logger.info(response.text)
@@ -368,11 +368,11 @@ class SpotifyConnector:
 if __name__ == "__main__":
     # To use the library as a script, fetch the config from the environment
     import os
-    BASE_URL = os.environ.get("EXPERIMENTAL_SPOTIFY_BASE_URL")
-    CLIENT_ID = os.environ.get("EXPERIMENTAL_SPOTIFY_CLIENT_ID")
-    PODCAST_ID = os.environ.get("EXPERIMENTAL_SPOTIFY_PODCAST_ID")
-    SP_DC = os.environ.get("EXPERIMENTAL_SPOTIFY_SP_DC")
-    SP_KEY = os.environ.get("EXPERIMENTAL_SPOTIFY_SP_KEY")
+    BASE_URL = os.environ.get("SPOTIFY_BASE_URL")
+    CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID")
+    PODCAST_ID = os.environ.get("SPOTIFY_PODCAST_ID")
+    SP_DC = os.environ.get("SPOTIFY_SP_DC")
+    SP_KEY = os.environ.get("SPOTIFY_SP_KEY")
 
     connector = SpotifyConnector(
         base_url=BASE_URL,
