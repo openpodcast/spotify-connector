@@ -1,6 +1,7 @@
 import json
 from loguru import logger
 from .connector import SpotifyConnector
+import datetime as dt
 
 # To use the library as a script, fetch the config from the environment
 import os
