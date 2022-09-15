@@ -22,26 +22,26 @@ connector = SpotifyConnector(
 meta = connector.metadata()
 logger.info("Podcast Metadata = {}", json.dumps(meta, indent=4))
 
-# Fetch stream data for podcast
+# Fetch episodes
+# end  = dt.datetime.now()
+# start = dt.datetime.now() - dt.timedelta(days=7)
+# episodes = connector.episodes(start, end)
+# logger.info("Podcast Episodes = {}", json.dumps(episodes, indent=4))
+
+# Fetch stream data for podcast episode
 # end  = dt.datetime.now()
 # start = dt.datetime.now() - dt.timedelta(days=7)
 # streams = connector.streams("48DAya24YOjS7Ez49JSH3y", start, end)
 # logger.info("Podcast Streams = {}", json.dumps(streams, indent=4))
 
-# Fetch listener data for podcast
+# Fetch listener data for podcast episode
 # end  = dt.datetime.now()
 # start = dt.datetime.now() - dt.timedelta(days=7)
 # listeners = connector.listeners("48DAya24YOjS7Ez49JSH3y", start, end)
 # logger.info("Podcast Listeners = {}", json.dumps(listeners, indent=4))
 
-# Fetch aggregate data for podcast
+# Fetch aggregate data for podcast episode
 # end  = dt.datetime.now()
 # start = dt.datetime.now() - dt.timedelta(days=7)
 # aggregate  = connector.aggregate("48DAya24YOjS7Ez49JSH3y", start, end)
 # logger.info("Podcast Aggregate = {}", json.dumps(aggregate, indent=4))
-
-# Fetch episode data for podcast
-# end  = dt.datetime.now()
-# start = dt.datetime.now() - dt.timedelta(days=7)
-# episodes = connector.episodes(start, end)
-# logger.info("Podcast Episodes = {}", json.dumps(episodes, indent=4))
