@@ -41,16 +41,41 @@ followers = connector.aggregate()
 # ...
 ```
 
-## Usage As An Application
+## Development
 
-1. Create an environment file and fill in the required values:
+1. Create a virtual environment:
+
+```sh
+python3 -m venv venv
+```
+
+2. Activate the virtual environment:
+
+```sh
+source venv/bin/activate
+```
+
+3. Install the dependencies:
+
+```sh
+pip install -r requirements.txt
+```
+
+4. Create an environment file and fill in the required values:
 
 ```sh
 cp .env.example .env
 ```
 
-2. Run the script:
+5. Run the script:
 
 ```sh
-python3 main.py
+python3 -m spotifyconnector
+```
+
+6. Publish the package:
+
+```sh
+python3 setup.py sdist bdist_wheel
+twine upload dist/*
 ```
