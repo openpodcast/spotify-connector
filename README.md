@@ -60,7 +60,7 @@ cp .env.example .env
 3. Run the script in the virtual environment, which will [automatically load your `.env`](https://pipenv.pypa.io/en/latest/advanced/#automatic-loading-of-env):
 
 ```sh
-pipenv run python -m spotifyconnector
+pipenv run spotifyconnector
 ```
 
 To add a new dependency for use during the development of this library:
