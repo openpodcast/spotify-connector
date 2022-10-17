@@ -46,3 +46,7 @@ logger.info("Podcast Metadata = {}", json.dumps(meta, indent=4))
 # start = dt.datetime.now() - dt.timedelta(days=7)
 # aggregate  = connector.aggregate("48DAya24YOjS7Ez49JSH3y", start, end)
 # logger.info("Podcast Aggregate = {}", json.dumps(aggregate, indent=4))
+
+# Fetch performance data for podcast episode
+performance = connector.performance("48DAya24YOjS7Ez49JSH3y")
+logger.info("Podcast Performance = {}", json.dumps(performance, indent=4))

@@ -366,3 +366,21 @@ class SpotifyConnector:
         date_params = self._date_params(start, end)
         return self._request(url, params={**date_params, **{"page": page, "size": size, "sortBy": sortBy, "sortOrder": sortOrder, "filter": filter}})
 
+    def performance(
+        self,
+        episode_id: str,
+    ) -> dict:
+        """Gets the episode performance data for a given episode.
+
+        Args:
+            episode_id (str): ID of the episode to request data for.
+
+        Returns:
+            dict: [performance]
+        """
+        url = self._build_url(
+            "episodes",
+            episode_id,
+            "performance",
+        )
+        return self._request(url)

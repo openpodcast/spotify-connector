@@ -38,6 +38,9 @@ listeners = connector.listeners()
 # Get the list of followers
 followers = connector.aggregate()
 
+# Get the performance of an episode
+performance = connector.performance("episode_id")
+
 # ...
 ```
 
@@ -61,10 +64,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Create an environment file and fill in the required values:
+4. Create an environment file and fill in the required values. Run `source .env`
+   to load the environment variables.
 
 ```sh
 cp .env.example .env
+source .env
 ```
 
 5. Run the script:
