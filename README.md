@@ -49,7 +49,7 @@ performance = connector.performance("episode_id")
 1. Create a virtual environment:
 
 ```sh
-python3 -m venv venv
+python -m venv venv
 ```
 
 2. Activate the virtual environment:
@@ -75,12 +75,12 @@ source .env
 5. Run the script:
 
 ```sh
-python3 -m spotifyconnector
+python -m spotifyconnector
 ```
 
 6. Publish the package:
 
 ```sh
-python3 setup.py sdist bdist_wheel
+python setup.py sdist bdist_wheel
 twine upload dist/*
 ```
