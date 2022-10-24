@@ -18,18 +18,18 @@
     "default": {
         "certifi": {
             "hashes": [
-                "sha256:36973885b9542e6bd01dea287b2b4b3b21236307c56324fcc3f1160f2d655ed5",
-                "sha256:e232343de1ab72c2aa521b625c80f699e356830fd0e2c620b465b304b17b0516"
+                "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14",
+                "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==2022.9.14"
+            "version": "==2022.9.24"
         },
         "charset-normalizer": {
             "hashes": [
                 "sha256:5a3d016c7c547f69d6f81fb0db9449ce888b418b5b9952cc5e6e66843e9dd845",
                 "sha256:83e9a75d1911279afd89352c68b45348559d1fc0506b054b346651b5e7fee29f"
             ],
-            "markers": "python_version >= '3.6'",
+            "markers": "python_full_version >= '3.6.0'",
             "version": "==2.1.1"
         },
         "idna": {
@@ -108,11 +108,11 @@
         },
         "tenacity": {
             "hashes": [
-                "sha256:43242a20e3e73291a28bcbcacfd6e000b02d3857a9a9fff56b297a27afdc932f",
-                "sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a"
+                "sha256:35525cd47f82830069f0d6b73f7eb83bc5b73ee2fff0437952cedf98b27653ac",
+                "sha256:e48c437fdf9340f5666b92cd7990e96bc5fc955e1298baf4a907e3972067a445"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==8.0.1"
+            "version": "==8.1.0"
         },
         "urllib3": {
             "hashes": [
