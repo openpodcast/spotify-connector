@@ -72,7 +72,7 @@ To add a new dependency for use during the development of this library:
 pipenv install --dev $package
 ```
 
-To add a new dependency necessary for the correct operation of this library add the package to the `install_requires` section of `./setup.py`, then:
+To add a new dependency necessary for the correct operation of this library, add the package to the `install_requires` section of `./setup.py`, then:
 
 ```sh
 pipenv install
