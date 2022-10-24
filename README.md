@@ -48,7 +48,7 @@ performance = connector.performance("episode_id")
 
 We are using [Pipenv](https://pipenv.pypa.io/en/latest/index.html#install-pipenv-today) for virtualenv and dev dependency management. With Pipenv installed:
 
-1. Install your local checkedout code in [editable mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html), including it's dependencies, and all dev depndencies into a virtual environment:
+1. Install your locally checked out code in [editable mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html), including its dependencies, and all dev dependencies into a virtual environment:
 
 ```sh
 pipenv sync --dev
