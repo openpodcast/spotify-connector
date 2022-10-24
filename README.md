@@ -17,7 +17,7 @@ It can be used to export data from the dashboard.
 ## Usage as a library
 
 ```python
-from spotify_importer import SpotifyImporter
+from spotifyconnector import SpotifyConnector
 
 connector = SpotifyConnector(
     client_id="your_client_id",
