@@ -1,7 +1,7 @@
 # Spotify Connector
 
-This is a simple library for connecting to the inofficial Spotify podcast API.
-It can be used to export data from the dashboard.
+This is a simple library for connecting to the inofficial Spotify podcast API.  
+It can be used to export data from your dashboard at https://podcasters.spotify.com/home.
 
 ## Supported Data
 
