@@ -9,6 +9,11 @@ setup(
     long_description_content_type='text/markdown',
     author='Open Podcast',
     license='MIT',
+    entry_points={
+        'console_scripts': [
+            'spotifyconnector = spotifyconnector.__main__:main',
+        ]
+    },
     install_requires=[
         'requests',
         'loguru',

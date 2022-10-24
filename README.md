@@ -1,7 +1,7 @@
 # Spotify Connector
 
-This is a simple library for connecting to the inofficial Spotify podcast API.
-It can be used to export data from the dashboard.
+This is a simple library for connecting to the inofficial Spotify podcast API.  
+It can be used to export data from your dashboard at https://podcasters.spotify.com/home.
 
 ## Supported Data
 
@@ -46,39 +46,39 @@ performance = connector.performance("episode_id")
 
 ## Development
 
-1. Create a virtual environment:
+We are using [Pipenv](https://pipenv.pypa.io/en/latest/index.html#install-pipenv-today) for virtualenv and dev dependency management. With Pipenv installed:
+
+1. Install your local checkedout code in [editable mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html), including it's dependencies, and all dev depndencies into a virtual environment:
 
 ```sh
-python -m venv venv
+pipenv sync --dev
 ```
 
-2. Activate the virtual environment:
-
-```sh
-source venv/bin/activate
-```
-
-3. Install the dependencies:
-
-```sh
-pip install -r requirements.txt
-```
-
-4. Create an environment file and fill in the required values. Run `source .env`
-   to load the environment variables.
+2. Create an environment file and fill in the required values:
 
 ```sh
 cp .env.example .env
-source .env
 ```
 
-5. Run the script:
+3. Run the script in the virtual environment, which will [automatically load your `.env`](https://pipenv.pypa.io/en/latest/advanced/#automatic-loading-of-env):
 
 ```sh
-python -m spotifyconnector
+pipenv run spotifyconnector
 ```
 
-6. Publish the package:
+To add a new dependency for use during the development of this library:
+
+```sh
+pipenv install --dev $package
+```
+
+To add a new dependency necessary for the correct operation of this library add the package to the `install_requires` section of `./setup.py`, then:
+
+```sh
+pipenv install
+```
+
+To publish the package:
 
 ```sh
 python setup.py sdist bdist_wheel
