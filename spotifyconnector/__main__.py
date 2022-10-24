@@ -25,10 +25,11 @@ def main():
     logger.info("Podcast Metadata = {}", json.dumps(meta, indent=4))
 
     # Fetch episodes
-    # end  = dt.datetime.now()
-    # start = dt.datetime.now() - dt.timedelta(days=7)
-    # episodes = connector.episodes(start, end)
-    # logger.info("Podcast Episodes = {}", json.dumps(episodes, indent=4))
+    end  = dt.datetime.now()
+    start = dt.datetime.now() - dt.timedelta(days=7)
+    # Get all episodes from iterator
+    for episode in connector.episodes(start, end):
+        logger.info("Episode = {}", json.dumps(episode, indent=4))
 
     # Fetch stream data for podcast episode
     # end  = dt.datetime.now()

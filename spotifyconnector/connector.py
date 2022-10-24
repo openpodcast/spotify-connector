@@ -324,9 +324,6 @@ class SpotifyConnector:
         )
         return self._request(url, params=self._date_params(start, end))
 
-    # Create endpoint for retrieving all podcast episodes
-    # Example URL: https://generic.wg.spotify.com/podcasters/v0/shows/0WgG3O6LTgbGN5SQmVrNRG/episodes?end=2022-09-13&filter=&page=1&size=50&sortBy=releaseDate&sortOrder=descending&start=2022-09-07
-    # We also return a return a cursor for the next page of results
     def episodes(
         self,
         start: dt.date,
@@ -340,6 +337,8 @@ class SpotifyConnector:
         """Loads podcast episode data, which includes the number of
         starts and completions for each episode.
 
+        Returns an iterator over all episodes.
+
         Args:
             episode_id (str): ID of the episode to request data for.
             start (dt.date): Earliest date to request data for.
@@ -352,7 +351,7 @@ class SpotifyConnector:
             filter (str): Filter by field
 
         Returns:
-            dict: [episode]
+            (iterable): [episodes]
         """
         if end is None:
             end = start
@@ -362,9 +361,19 @@ class SpotifyConnector:
             self.podcast_id,
             "episodes",
         )
-        # return self._request(url, params=self._date_params(start, end))
         date_params = self._date_params(start, end)
-        return self._request(url, params={**date_params, **{"page": page, "size": size, "sortBy": sortBy, "sortOrder": sortOrder, "filter": filter}})
+
+        # Yield each episode (handles pagination)
+        while True:
+            response = self._request(url, params={**date_params, **{"page": page, "size": size, "sortBy": sortBy, "sortOrder": sortOrder, "filter": filter}})
+            for episode in response["episodes"]:
+                yield episode
+
+            if page == response["totalPages"]:
+                break
+
+            page += 1
+
 
     def performance(
         self,
