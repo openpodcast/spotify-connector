@@ -44,16 +44,16 @@ connector = SpotifyConnector(
 # Get podcast metadata
 connector.metadata()
 
-# Iterate over all episodes (supports pagination)
-for episode in connector.episodes():
-    # Do something with episode
-    pass
-
-# Get the list of listeners
+# Get the list of listeners of a podcast
 listeners = connector.listeners()
 
 # Get the list of followers
 followers = connector.aggregate()
+
+# Iterate over all episodes (supports pagination)
+for episode in connector.episodes():
+    # Do something with episode
+    pass
 
 # Get the performance of an episode
 performance = connector.performance("episode_id")
