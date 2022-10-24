@@ -1,6 +1,6 @@
 .PHONY: dev
 dev:
-	python -m spotifyconnector
+	pipenv run spotifyconnector
 
 .PHONY: clean
 clean:
