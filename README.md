@@ -1,7 +1,7 @@
 # Spotify Connector
 
-This is a simple library for connecting to the inofficial Spotify podcast API.
-It can be used to export data from the dashboard.
+This is a simple library for connecting to the inofficial Spotify podcast API.  
+It can be used to export data from your dashboard at https://podcasters.spotify.com/home.
 
 ## Supported Data
 
@@ -37,6 +37,9 @@ listeners = connector.listeners()
 
 # Get the list of followers
 followers = connector.aggregate()
+
+# Get the performance of an episode
+performance = connector.performance("episode_id")
 
 # ...
 ```
@@ -78,6 +81,6 @@ pipenv install
 To publish the package:
 
 ```sh
-python3 setup.py sdist bdist_wheel
+python setup.py sdist bdist_wheel
 twine upload dist/*
 ```

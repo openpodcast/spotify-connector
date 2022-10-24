@@ -2,6 +2,7 @@ import json
 from loguru import logger
 from .connector import SpotifyConnector
 import os
+import datetime as dt
 
 def main():
     # To use the library as a script, fetch the config from the environment
@@ -46,7 +47,10 @@ def main():
     # start = dt.datetime.now() - dt.timedelta(days=7)
     # aggregate  = connector.aggregate("48DAya24YOjS7Ez49JSH3y", start, end)
     # logger.info("Podcast Aggregate = {}", json.dumps(aggregate, indent=4))
+    
+    # Fetch performance data for podcast episode
+    # performance = connector.performance("48DAya24YOjS7Ez49JSH3y")
+    # logger.info("Podcast Performance = {}", json.dumps(performance, indent=4))
 
 if __name__ == "__main__":
     main()
-
