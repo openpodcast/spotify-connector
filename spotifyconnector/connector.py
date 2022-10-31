@@ -39,17 +39,18 @@ def random_string(
 class SpotifyConnector:
     """Representation of the inofficial Spotify podcast API."""
 
-    def __init__(self,
+    def __init__(
+        self,
         base_url,
         client_id,
         podcast_id,
         sp_dc,
         sp_key,
-     ):
+    ):
         """Initializes the SpotifyConnector object.
 
         Args:
-            base_url (str, optional): Base URL for the API. 
+            base_url (str, optional): Base URL for the API.
             client_id (str, optional): Spotify Client ID for the API.
             sp_dc (str, optional): Spotify cookie.
             sp_key (str, optional): Spotify cookie.
@@ -224,27 +225,36 @@ class SpotifyConnector:
 
         raise Exception("All retries failed!")
 
-    def metadata(self) -> dict:
+    def metadata(self, episode=None) -> dict:
         """Loads metadata for podcast.
-        
+
         Args:
             podcast_id (str): ID of the podcast to request data for.
-            
+            episode (str): ID of the episode to request data for (optional).
+              If this is not provided, data for all episodes will be returned.
+
         Returns:
             dict: Response data from API.
         """
-        url = self._build_url(
-           "shows",
-           self.podcast_id,
-           "metadata",
-        )
+        if episode is None:
+            url = self._build_url(
+                "shows",
+                self.podcast_id,
+                "metadata",
+            )
+        else:
+            url = self._build_url(
+                "episodes",
+                episode,
+                "metadata",
+            )
         return self._request(url)
 
     def streams(
         self,
         start: dt.date,
         end: Optional[dt.date] = None,
-        episode = None,
+        episode=None,
     ) -> dict:
         """Loads podcast/episode stream data, which includes the number of
         starts and completions for each episode.
@@ -280,7 +290,7 @@ class SpotifyConnector:
         self,
         start: dt.date,
         end: Optional[dt.date] = None,
-        episode = None,
+        episode=None,
     ) -> dict:
         """Loads podcast listener data, which includes the number of
         listeners for each episode.
@@ -316,7 +326,7 @@ class SpotifyConnector:
         self,
         start: dt.date,
         end: Optional[dt.date] = None,
-        episode = None,
+        episode=None,
     ) -> dict:
         """Loads podcast aggregate data, which includes the number of
         starts and completions for each episode.
@@ -389,7 +399,19 @@ class SpotifyConnector:
 
         # Yield each episode (handles pagination)
         while True:
-            response = self._request(url, params={**date_params, **{"page": page, "size": size, "sortBy": sortBy, "sortOrder": sortOrder, "filter": filter}})
+            response = self._request(
+                url,
+                params={
+                    **date_params,
+                    **{
+                        "page": page,
+                        "size": size,
+                        "sortBy": sortBy,
+                        "sortOrder": sortOrder,
+                        "filter": filter,
+                    },
+                },
+            )
             for episode in response["episodes"]:
                 yield episode
 
@@ -397,7 +419,6 @@ class SpotifyConnector:
                 break
 
             page += 1
-
 
     def performance(
         self,
