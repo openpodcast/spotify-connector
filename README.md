@@ -15,6 +15,21 @@ https://podcasters.spotify.com/home.
 - Country
 - Episode performance
 
+## Credentials
+
+Before you can use the library you must extract your Spotify credentials from the dashboard;
+they are **not** exposed through your Spotify settings.
+
+You can use our [web-extension](https://github.com/openpodcast/web-extension) for that
+or [take a look at the code](https://github.com/openpodcast/web-extension/blob/7ce0865d22bea34fcfc53eec06b25cd076aa8034/src/openpodcast.js)
+to see how to do it manually.
+
+## Installation
+
+```
+pip install spotifyconnector
+```
+
 ## Usage as a library
 
 ```python
@@ -31,14 +46,16 @@ connector = SpotifyConnector(
 # Get podcast metadata
 connector.metadata()
 
-# Get the list of episodes
-episodes = connector.episodes()
-
-# Get the list of listeners
+# Get the list of listeners of a podcast
 listeners = connector.listeners()
 
 # Get the list of followers
 followers = connector.aggregate()
+
+# Iterate over all episodes (supports pagination)
+for episode in connector.episodes():
+    # Do something with episode
+    pass
 
 # Get the performance of an episode
 performance = connector.performance("episode_id")
@@ -102,3 +119,7 @@ make publish
 [pipenv]: https://pipenv.pypa.io/en/latest/index.html#install-pipenv-today
 [development mode]: https://setuptools.pypa.io/en/latest/userguide/development_mode.html
 [env]: https://pipenv.pypa.io/en/latest/advanced/#automatic-loading-of-env
+
+## Credits
+
+This was inspired by the code at https://github.com/wdr-data/wdr-okr, extended and released to PyPi.
