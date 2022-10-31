@@ -1,7 +1,8 @@
 # Spotify Connector
 
 This is a simple library for connecting to the inofficial Spotify podcast API.  
-It can be used to export data from your dashboard at https://podcasters.spotify.com/home.
+It can be used to export data from your dashboard at
+https://podcasters.spotify.com/home.
 
 ## Supported Data
 
@@ -19,6 +20,7 @@ It can be used to export data from your dashboard at https://podcasters.spotify.
 ```python
 from spotifyconnector import SpotifyConnector
 
+# Set up the connector
 connector = SpotifyConnector(
     client_id="your_client_id",
     client_secret="your_client_secret",
@@ -44,11 +46,15 @@ performance = connector.performance("episode_id")
 # ...
 ```
 
+See `__main.py__` for all endpoints.
+
 ## Development
 
-We are using [Pipenv](https://pipenv.pypa.io/en/latest/index.html#install-pipenv-today) for virtualenv and dev dependency management. With Pipenv installed:
+We use [Pipenv] for virtualenv and dev dependency management. With Pipenv
+installed:
 
-1. Install your locally checked out code in [editable mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html), including its dependencies, and all dev dependencies into a virtual environment:
+1. Install your locally checked out code in [development mode], including its
+   dependencies, and all dev dependencies into a virtual environment:
 
 ```sh
 pipenv sync --dev
@@ -60,7 +66,8 @@ pipenv sync --dev
 cp .env.example .env
 ```
 
-3. Run the script in the virtual environment, which will [automatically load your `.env`](https://pipenv.pypa.io/en/latest/advanced/#automatic-loading-of-env):
+3. Run the script in the virtual environment, which will [automatically load
+   your `.env`][env]:
 
 ```sh
 pipenv run spotifyconnector
@@ -72,7 +79,8 @@ To add a new dependency for use during the development of this library:
 pipenv install --dev $package
 ```
 
-To add a new dependency necessary for the correct operation of this library, add the package to the `install_requires` section of `./setup.py`, then:
+To add a new dependency necessary for the correct operation of this library, add
+the package to the `install_requires` section of `./setup.py`, then:
 
 ```sh
 pipenv install
@@ -84,3 +92,13 @@ To publish the package:
 python setup.py sdist bdist_wheel
 twine upload dist/*
 ```
+
+or
+
+```sh
+make publish
+```
+
+[pipenv]: https://pipenv.pypa.io/en/latest/index.html#install-pipenv-today
+[development mode]: https://setuptools.pypa.io/en/latest/userguide/development_mode.html
+[env]: https://pipenv.pypa.io/en/latest/advanced/#automatic-loading-of-env

@@ -242,18 +242,19 @@ class SpotifyConnector:
 
     def streams(
         self,
-        episode_id: str,
         start: dt.date,
         end: Optional[dt.date] = None,
+        episode = None,
     ) -> dict:
-        """Loads podcast stream data, which includes the number of
+        """Loads podcast/episode stream data, which includes the number of
         starts and completions for each episode.
 
         Args:
-            episode_id (str): ID of the episode to request data for.
             start (dt.date): Earliest date to request data for.
             end (Optional[dt.date], optional): Most recent date to request data for.
               Defaults to None. Will be set to ``start`` if None.
+            episode (str): ID of the episode to request data for (optional).
+              If this is not provided, data for all episodes will be returned.
 
         Returns:
             dict: [description]
@@ -261,27 +262,35 @@ class SpotifyConnector:
         if end is None:
             end = start
 
-        url = self._build_url(
-            "episodes",
-            episode_id,
-            "detailedStreams",
-        )
+        if episode is None:
+            url = self._build_url(
+                "shows",
+                self.podcast_id,
+                "detailedStreams",
+            )
+        else:
+            url = self._build_url(
+                "episodes",
+                episode,
+                "detailedStreams",
+            )
         return self._request(url, params=self._date_params(start, end))
 
     def listeners(
         self,
-        episode_id: str,
         start: dt.date,
         end: Optional[dt.date] = None,
+        episode = None,
     ) -> dict:
         """Loads podcast listener data, which includes the number of
         listeners for each episode.
 
         Args:
-            episode_id (str): ID of the episode to request data for.
             start (dt.date): Earliest date to request data for.
             end (Optional[dt.date], optional): Most recent date to request data for.
               Defaults to None. Will be set to ``start`` if None.
+            episode (str): ID of the episode to request data for (optional).
+              If this is not provided, data for all episodes will be returned.
 
         Returns:
             dict: [description]
@@ -289,27 +298,35 @@ class SpotifyConnector:
         if end is None:
             end = start
 
-        url = self._build_url(
-            "episodes",
-            episode_id,
-            "listeners",
-        )
+        if episode is None:
+            url = self._build_url(
+                "shows",
+                self.podcast_id,
+                "listeners",
+            )
+        else:
+            url = self._build_url(
+                "episodes",
+                episode,
+                "listeners",
+            )
         return self._request(url, params=self._date_params(start, end))
 
     def aggregate(
         self,
-        episode_id: str,
         start: dt.date,
         end: Optional[dt.date] = None,
+        episode = None,
     ) -> dict:
         """Loads podcast aggregate data, which includes the number of
         starts and completions for each episode.
 
         Args:
-            episode_id (str): ID of the episode to request data for.
             start (dt.date): Earliest date to request data for.
             end (Optional[dt.date], optional): Most recent date to request data for.
               Defaults to None. Will be set to ``start`` if None.
+            episode (str): ID of the episode to request data for (optional).
+              If this is not provided, data for all episodes will be returned.
 
         Returns:
             dict: [aggregate]
@@ -317,11 +334,18 @@ class SpotifyConnector:
         if end is None:
             end = start
 
-        url = self._build_url(
-            "episodes",
-            episode_id,
-            "aggregate",
-        )
+        if episode is None:
+            url = self._build_url(
+                "shows",
+                self.podcast_id,
+                "aggregate",
+            )
+        else:
+            url = self._build_url(
+                "episodes",
+                episode,
+                "aggregate",
+            )
         return self._request(url, params=self._date_params(start, end))
 
     def episodes(
@@ -340,7 +364,7 @@ class SpotifyConnector:
         Returns an iterator over all episodes.
 
         Args:
-            episode_id (str): ID of the episode to request data for.
+            episode (str): ID of the episode to request data for.
             start (dt.date): Earliest date to request data for.
             end (Optional[dt.date], optional): Most recent date to request data for.
               Defaults to None. Will be set to ``start`` if None.
@@ -377,19 +401,19 @@ class SpotifyConnector:
 
     def performance(
         self,
-        episode_id: str,
+        episode: str,
     ) -> dict:
         """Gets the episode performance data for a given episode.
 
         Args:
-            episode_id (str): ID of the episode to request data for.
+            episode (str): ID of the episode to request data for.
 
         Returns:
             dict: [performance]
         """
         url = self._build_url(
             "episodes",
-            episode_id,
+            episode,
             "performance",
         )
         return self._request(url)
