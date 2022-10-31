@@ -116,10 +116,11 @@ or
 make publish
 ```
 
+## Credits
+
+This was inspired by the code at [wdr-okr], extended and released to PyPi.
+
 [pipenv]: https://pipenv.pypa.io/en/latest/index.html#install-pipenv-today
 [development mode]: https://setuptools.pypa.io/en/latest/userguide/development_mode.html
 [env]: https://pipenv.pypa.io/en/latest/advanced/#automatic-loading-of-env
-
-## Credits
-
-This was inspired by the code at https://github.com/wdr-data/wdr-okr, extended and released to PyPi.
+[wdr-okr]: https://github.com/wdr-data/wdr-okr
