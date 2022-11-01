@@ -385,7 +385,7 @@ class SpotifyConnector:
             filter (str): Filter by field
 
         Returns:
-            (iterable): [episodes]
+            (iterable): [episode]
         """
         if end is None:
             end = start
