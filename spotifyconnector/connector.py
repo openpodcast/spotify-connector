@@ -229,7 +229,6 @@ class SpotifyConnector:
         """Loads metadata for podcast.
 
         Args:
-            podcast_id (str): ID of the podcast to request data for.
             episode (str): ID of the episode to request data for (optional).
               If this is not provided, data for all episodes will be returned.
 
