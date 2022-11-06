@@ -321,6 +321,31 @@ class SpotifyConnector:
             )
         return self._request(url, params=self._date_params(start, end))
 
+    def followers(
+        self,
+        start: dt.date,
+        end: Optional[dt.date] = None,
+    ) -> dict:
+        """Loads podcast follower data.
+
+        Args:
+            start (dt.date): Earliest date to request data for.
+            end (Optional[dt.date], optional): Most recent date to request data for.
+              Defaults to None. Will be set to ``start`` if None.
+
+        Returns:
+            dict: [description]
+        """
+        if end is None:
+            end = start
+
+        url = self._build_url(
+            "shows",
+            self.podcast_id,
+            "followers",
+        )
+        return self._request(url, params=self._date_params(start, end))
+
     def aggregate(
         self,
         start: dt.date,

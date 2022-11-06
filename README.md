@@ -49,8 +49,8 @@ connector.metadata()
 # Get the list of listeners of a podcast
 listeners = connector.listeners()
 
-# Get the list of followers
-followers = connector.aggregate()
+# Get the aggregated listeners of a podcast (by age, country, gender)
+aggregate = connector.aggregate()
 
 # Iterate over all episodes (supports pagination)
 for episode in connector.episodes():

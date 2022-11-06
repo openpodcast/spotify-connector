@@ -31,6 +31,12 @@ def main():
     streams = connector.streams(start, end)
     logger.info("Podcast Streams = {}", json.dumps(streams, indent=4))
 
+    # Fetch followers for podcast
+    end = dt.datetime.now()
+    start = dt.datetime.now() - dt.timedelta(days=1)
+    followers = connector.followers(start, end)
+    logger.info("Podcast Followers = {}", json.dumps(followers, indent=4))
+
     # Fetch aggregate data for podcast
     end = dt.datetime.now()
     start = dt.datetime.now() - dt.timedelta(days=1)
