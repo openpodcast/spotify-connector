@@ -1,6 +1,6 @@
 # Spotify Connector
 
-This is a simple library for connecting to the inofficial Spotify podcast API.  
+This is a simple library for connecting to the unofficial Spotify podcast API.  
 It can be used to export data from your dashboard at
 https://podcasters.spotify.com/home.
 
@@ -17,7 +17,7 @@ https://podcasters.spotify.com/home.
 
 ## Credentials
 
-Before you can use the library you must extract your Spotify credentials from the dashboard;
+Before you can use the library, you must extract your Spotify credentials from the dashboard;
 they are **not** exposed through your Spotify settings.
 
 You can use our [web-extension](https://github.com/openpodcast/web-extension) for that
