@@ -46,7 +46,7 @@ def main():
     # Fetch podcast episodes
     end = dt.datetime.now()
     start = dt.datetime.now() - dt.timedelta(days=7)
-    # Get all episodes from iterator
+    # Get all episodes from generator
     for episode in connector.episodes(start, end):
         logger.info("Episode = {}", json.dumps(episode, indent=4))
 

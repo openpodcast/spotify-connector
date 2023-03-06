@@ -26,6 +26,7 @@ import yaml
 
 
 DELAY_BASE = 2.0
+MAX_REQUEST_ATTEMPTS = 6
 
 
 def random_string(
@@ -183,8 +184,7 @@ class SpotifyConnector:
     def _request(self, url: str, *, params: Optional[Dict[str, str]] = None) -> dict:
         logger.trace("url = {}", url)
         delay = DELAY_BASE
-        for attempt in range(6):
-            sleep(delay)
+        for attempt in range(MAX_REQUEST_ATTEMPTS):
             self._ensure_auth()
 
             # Create request object with requests and trace it before sending
@@ -207,6 +207,7 @@ class SpotifyConnector:
                     url,
                     delay,
                 )
+                sleep(delay)
                 continue
 
             elif response.status_code == 401:
