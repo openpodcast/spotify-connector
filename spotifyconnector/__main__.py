@@ -21,6 +21,12 @@ def main():
         sp_key=SP_KEY,
     )
 
+    # If podcast ID is not provided, fetch catalog of podcasts
+    if not connector.podcast_id:
+        catalog = connector.catalog()
+        logger.info("Podcast Catalog = {}", json.dumps(catalog, indent=4))
+        return
+
     # Fetch metadata for podcast
     meta = connector.metadata()
     logger.info("Podcast Metadata = {}", json.dumps(meta, indent=4))
@@ -63,13 +69,15 @@ def main():
     # Fetch listener data for single podcast episode
     end = dt.datetime.now()
     start = dt.datetime.now() - dt.timedelta(days=7)
-    listeners = connector.listeners(start, end, episode="48DAya24YOjS7Ez49JSH3y")
+    listeners = connector.listeners(
+        start, end, episode="48DAya24YOjS7Ez49JSH3y")
     logger.info("Episode Listeners = {}", json.dumps(listeners, indent=4))
 
     # Fetch aggregate data for single podcast episode
     end = dt.datetime.now()
     start = dt.datetime.now() - dt.timedelta(days=7)
-    aggregate = connector.aggregate(start, end, episode="48DAya24YOjS7Ez49JSH3y")
+    aggregate = connector.aggregate(
+        start, end, episode="48DAya24YOjS7Ez49JSH3y")
     logger.info("Episode Aggregate = {}", json.dumps(aggregate, indent=4))
 
     # Fetch performance data for single podcast episode

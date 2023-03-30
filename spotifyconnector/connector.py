@@ -109,7 +109,8 @@ class SpotifyConnector:
                     "code_challenge": code_challenge,
                     "code_challenge_method": "S256",
                     "state": state,
-                    "response_mode": "web_message",  # TODO: Figure out if there is a way to get pure JSON
+                    # TODO: Figure out if there is a way to get pure JSON
+                    "response_mode": "web_message",
                     "prompt": "none",
                 },
                 cookies={
@@ -123,7 +124,8 @@ class SpotifyConnector:
             # We get some weird HTML here that contains some JS
             html = response.text
 
-            match = re.search(r"const authorizationResponse = (.*?);", html, re.DOTALL)
+            match = re.search(
+                r"const authorizationResponse = (.*?);", html, re.DOTALL)
             json_str = match.group(1)
 
             # The extracted string isn't strictly valid JSON due to some missing quotes,
@@ -444,6 +446,32 @@ class SpotifyConnector:
                 break
 
             page += 1
+
+    def catalog(self) -> dict:
+        """Loads podcast catalog data.
+
+        Returns:
+            dict: [catalog]
+        """
+        url = self._build_url(
+            "user",
+            "shows"
+        )
+
+        end = dt.date.today()
+        start = end - dt.timedelta(days=30)
+
+        return self._request(
+            url,
+            params={
+                "page": 1,
+                "size": 200,
+                "sortBy": "name",
+                "sortOrder": "ascending",
+                "start": start.strftime("%Y-%m-%d"),
+                "end": end.strftime("%Y-%m-%d")
+            }
+        )
 
     def performance(
         self,
