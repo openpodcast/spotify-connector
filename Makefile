@@ -1,3 +1,7 @@
+.PHONY: help
+help: ## help message, list all command
+	@echo -e "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\\x1b[36m\1\\x1b[m:\2/' | column -c2 -t -s :)"
+
 .PHONY: dev
 dev:
 	pipenv run spotifyconnector
@@ -10,3 +14,7 @@ clean:
 publish: clean
 	pipenv run python setup.py sdist bdist_wheel
 	twine upload --username mre0 dist/*
+
+.PHONY: init
+init:
+	pipenv install --dev
