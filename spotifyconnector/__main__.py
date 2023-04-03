@@ -45,35 +45,35 @@ def main():
 
     # Fetch podcast episodes
     end = dt.datetime.now()
-    start = dt.datetime.now() - dt.timedelta(days=7)
+    start = dt.datetime.now() - dt.timedelta(days=4)
     # Get all episodes from generator
     for episode in connector.episodes(start, end):
         logger.info("Episode = {}", json.dumps(episode, indent=4))
 
     # Fetch metadata for single podcast episode
-    episode_meta = connector.metadata(episode="48DAya24YOjS7Ez49JSH3y")
+    episode_meta = connector.metadata(episode=episode["id"])
     logger.info("Episode Streams = {}", json.dumps(episode_meta, indent=4))
 
     # Fetch stream data for single podcast episode
     end = dt.datetime.now()
     start = dt.datetime.now() - dt.timedelta(days=7)
-    streams = connector.streams(start, end, episode="48DAya24YOjS7Ez49JSH3y")
+    streams = connector.streams(start, end, episode=episode["id"])
     logger.info("Episode Streams = {}", json.dumps(streams, indent=4))
 
     # Fetch listener data for single podcast episode
-    end = dt.datetime.now()
-    start = dt.datetime.now() - dt.timedelta(days=7)
-    listeners = connector.listeners(start, end, episode="48DAya24YOjS7Ez49JSH3y")
-    logger.info("Episode Listeners = {}", json.dumps(listeners, indent=4))
+    start = dt.datetime.now() - dt.timedelta(days=4)
+    end = dt.datetime.now() - dt.timedelta(days=1)
+    listeners = connector.listeners(start, end, episode=episode["id"])
+    logger.info("Episode = {} Listeners = {}", episode["id"], json.dumps(listeners, indent=4))
 
     # Fetch aggregate data for single podcast episode
     end = dt.datetime.now()
     start = dt.datetime.now() - dt.timedelta(days=7)
-    aggregate = connector.aggregate(start, end, episode="48DAya24YOjS7Ez49JSH3y")
+    aggregate = connector.aggregate(start, end, episode=episode["id"])
     logger.info("Episode Aggregate = {}", json.dumps(aggregate, indent=4))
 
     # Fetch performance data for single podcast episode
-    performance = connector.performance("48DAya24YOjS7Ez49JSH3y")
+    performance = connector.performance(episode["id"])
     logger.info("Episode Performance = {}", json.dumps(performance, indent=4))
 
 
