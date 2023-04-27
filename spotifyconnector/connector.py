@@ -51,10 +51,11 @@ class SpotifyConnector:
         """Initializes the SpotifyConnector object.
 
         Args:
-            base_url (str, optional): Base URL for the API.
-            client_id (str, optional): Spotify Client ID for the API.
-            sp_dc (str, optional): Spotify cookie.
-            sp_key (str, optional): Spotify cookie.
+            base_url (str): Base URL for the API.
+            client_id (str): Spotify Client ID for the API.
+            podcast_id (str): Spotify Podcast ID for the API.
+            sp_dc (str): Spotify cookie.
+            sp_key (str): Spotify cookie.
         """
 
         self.base_url = base_url
