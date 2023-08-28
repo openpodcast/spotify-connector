@@ -4,3 +4,5 @@ The API is not documented and may change at any time. Use at your own risk.
 """
 
 from .connector import SpotifyConnector
+
+__all__ = ["SpotifyConnector"]

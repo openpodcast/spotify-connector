@@ -1,29 +1,27 @@
-"""This module provides a class to connect to an unofficial Spotify API
+"""
+This module provides a class to connect to an unofficial Spotify API
 that provides podcast analytics. It relies on using cookies generated
 manually by logging in with the appropriate user at podcasters.spotify.com.
 
 Cookies supposedly last 1 year.
 """
 
-from typing import Dict, Optional
-import datetime as dt
-from time import sleep
-from threading import RLock
-from urllib.request import Request
-from loguru import logger
 import random
 import string
 import base64
 import hashlib
 import re
-import json
+from typing import Dict, Optional
+import datetime as dt
+from time import sleep
+from threading import RLock
+from loguru import logger
 
 import requests
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
 import yaml
-
 
 DELAY_BASE = 2.0
 MAX_REQUEST_ATTEMPTS = 6
@@ -33,8 +31,23 @@ def random_string(
     length: int,
     chars: str = string.ascii_lowercase + string.ascii_uppercase + string.digits,
 ) -> str:
-    """Simple helper function to generate random strings suitable for use with Spotify"""
+    """
+    Simple helper function to generate random strings suitable for use with Spotify
+    """
     return "".join(random.choices(chars, k=length))
+
+
+class MaxRetriesException(Exception):
+    """
+    Raised when the maximum number of retries is reached
+    """
+
+    def __init__(self, url, last_status_code, attempts):
+        super().__init__(
+            f"All retries failed for URL {url}. "
+            f"Last status code: {last_status_code}. "
+            f"Attempts: {attempts}"
+        )
 
 
 class SpotifyConnector:
@@ -105,12 +118,14 @@ class SpotifyConnector:
                 params={
                     "response_type": "code",
                     "client_id": self.client_id,
-                    "scope": "streaming ugc-image-upload user-read-email user-read-private",
+                    "scope": (
+                        "streaming ugc-image-upload user-read-email "
+                        "user-read-private"
+                    ),
                     "redirect_uri": "https://podcasters.spotify.com",
                     "code_challenge": code_challenge,
                     "code_challenge_method": "S256",
                     "state": state,
-                    # TODO: Figure out if there is a way to get pure JSON
                     "response_mode": "web_message",
                     "prompt": "none",
                 },
@@ -118,6 +133,7 @@ class SpotifyConnector:
                     "sp_dc": self.sp_dc,
                     "sp_key": self.sp_key,
                 },
+                timeout=60,
             )
             logger.trace("response - {}", response)
             response.raise_for_status()
@@ -125,8 +141,7 @@ class SpotifyConnector:
             # We get some weird HTML here that contains some JS
             html = response.text
 
-            match = re.search(
-                r"const authorizationResponse = (.*?);", html, re.DOTALL)
+            match = re.search(r"const authorizationResponse = (.*?);", html, re.DOTALL)
             json_str = match.group(1)
 
             # The extracted string isn't strictly valid JSON due to some missing quotes,
@@ -151,6 +166,7 @@ class SpotifyConnector:
                     "redirect_uri": "https://podcasters.spotify.com",
                     "code_verifier": code_verifier,
                 },
+                timeout=60,
             )
             response.raise_for_status()
 
@@ -187,6 +203,8 @@ class SpotifyConnector:
     def _request(self, url: str, *, params: Optional[Dict[str, str]] = None) -> dict:
         logger.trace("url = {}", url)
         delay = DELAY_BASE
+
+        last_status_code = None
         for attempt in range(MAX_REQUEST_ATTEMPTS):
             self._ensure_auth()
 
@@ -213,7 +231,7 @@ class SpotifyConnector:
                 sleep(delay)
                 continue
 
-            elif response.status_code == 401:
+            if response.status_code == 401:
                 self._authenticate()
                 continue
 
@@ -227,7 +245,7 @@ class SpotifyConnector:
             logger.trace("response = {}", response.text)
             return response.json()
 
-        raise Exception("All retries failed!")
+        raise MaxRetriesException(url, last_status_code, MAX_REQUEST_ATTEMPTS)
 
     def metadata(self, episode=None) -> dict:
         """Loads metadata for podcast.
@@ -392,9 +410,9 @@ class SpotifyConnector:
         end: Optional[dt.date] = None,
         page: int = 1,
         size: int = 50,
-        sortBy: str = "releaseDate",
-        sortOrder: str = "descending",
-        filter: str = "",
+        sort_by: str = "releaseDate",
+        sort_order: str = "descending",
+        filter_by: str = "",
     ) -> dict:
         """Loads podcast episode data, which includes the number of
         starts and completions for each episode.
@@ -408,9 +426,9 @@ class SpotifyConnector:
               Defaults to None. Will be set to ``start`` if None.
             page (int): Page number to request
             size (int): Number of results per page
-            sortBy (str): Sort by field
-            sortOrder (str): Sort order
-            filter (str): Filter by field
+            sort_by (str): Sort by field
+            sort_order (str): Sort order
+            filter_by (str): Filter by field
 
         Returns:
             (iterable): [episode]
@@ -434,9 +452,9 @@ class SpotifyConnector:
                     **{
                         "page": page,
                         "size": size,
-                        "sortBy": sortBy,
-                        "sortOrder": sortOrder,
-                        "filter": filter,
+                        "sortBy": sort_by,
+                        "sortOrder": sort_order,
+                        "filter": filter_by,
                     },
                 },
             )
@@ -454,10 +472,7 @@ class SpotifyConnector:
         Returns:
             dict: [catalog]
         """
-        url = self._build_url(
-            "user",
-            "shows"
-        )
+        url = self._build_url("user", "shows")
 
         end = dt.date.today()
         start = end - dt.timedelta(days=30)
@@ -470,8 +485,8 @@ class SpotifyConnector:
                 "sortBy": "name",
                 "sortOrder": "ascending",
                 "start": start.strftime("%Y-%m-%d"),
-                "end": end.strftime("%Y-%m-%d")
-            }
+                "end": end.strftime("%Y-%m-%d"),
+            },
         )
 
     def performance(
