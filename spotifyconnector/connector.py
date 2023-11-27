@@ -27,12 +27,15 @@ import yaml
 DELAY_BASE = 2.0
 MAX_REQUEST_ATTEMPTS = 6
 
+
 class CredentialsExpired(Exception):
     """
     CredentialsExpired is raised when the Spotify API asks for a login
     This is usually because the cookies have expired.
     """
+
     pass
+
 
 def random_string(
     length: int,
@@ -91,7 +94,11 @@ class SpotifyConnector:
         # (to avoid spamming Spotify with requests and risking a ban)
         self._auth_poisoned = False
 
-    @retry(retry=retry_if_exception_type(HTTPError), wait=wait_exponential(), stop=stop_after_attempt(7))
+    @retry(
+        retry=retry_if_exception_type(HTTPError),
+        wait=wait_exponential(),
+        stop=stop_after_attempt(7),
+    )
     def _authenticate(self):
         """
         Retrieves a Bearer token for the inofficial Spotify API, valid 1 hour.
@@ -101,7 +108,10 @@ class SpotifyConnector:
         (with a few exceptions)
         """
         if self._auth_poisoned:
-            raise CredentialsExpired("Authentication has failed, not retrying. Check credentials and try again.")
+            raise CredentialsExpired(
+                "Authentication has failed, not retrying. "
+                "Check credentials and try again."
+            )
 
         with self._auth_lock:
             logger.info("Retrieving Bearer")
@@ -168,10 +178,10 @@ class SpotifyConnector:
             #       "state": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
             #     }
             #   };
-            # Check for this error case and raise an exception if we find it 
+            # Check for this error case and raise an exception if we find it
             # to avoid getting stuck in a loop
             if "login_required" in html:
-                self._auth_poisoned = True 
+                self._auth_poisoned = True
                 raise CredentialsExpired("Login required (credentials cookie expired?)")
 
             match = re.search(r"const authorizationResponse = (.*?);", html, re.DOTALL)
