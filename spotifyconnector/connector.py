@@ -34,8 +34,6 @@ class CredentialsExpired(Exception):
     This is usually because the cookies have expired.
     """
 
-    pass
-
 
 def random_string(
     length: int,
@@ -169,15 +167,10 @@ class SpotifyConnector:
 
             # At this point, we should have an HTTP response,
             # but it could be an error page, containing an error message like
-            # (function(window) {
-            #   const targetOrigin = "https://podcasters.spotify.com";
-            #   const authorizationResponse = {
-            #     type: "authorization_response",
-            #     response: {
-            #       "error": "login_required",
-            #       "state": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            #     }
-            #   };
+            # response: {
+            #   "error": "login_required",
+            #   "state": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+            # }
             # Check for this error case and raise an exception if we find it
             # to avoid getting stuck in a loop
             if "login_required" in html:
