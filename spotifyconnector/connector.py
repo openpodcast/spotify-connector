@@ -16,15 +16,23 @@ import datetime as dt
 from time import sleep
 from threading import RLock
 from loguru import logger
-
 import requests
+from requests.exceptions import HTTPError
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
+from tenacity.retry import retry_if_exception_type
 import yaml
 
 DELAY_BASE = 2.0
 MAX_REQUEST_ATTEMPTS = 6
+
+
+class CredentialsExpired(Exception):
+    """
+    CredentialsExpired is raised when the Spotify API asks for a login
+    This is usually because the cookies have expired.
+    """
 
 
 def random_string(
@@ -80,8 +88,15 @@ class SpotifyConnector:
         self._bearer: Optional[str] = None
         self._bearer_expires: Optional[dt.datetime] = None
         self._auth_lock = RLock()
+        # Flag to indicate that auth has failed and we should not retry
+        # (to avoid spamming Spotify with requests and risking a ban)
+        self._auth_poisoned = False
 
-    @retry(wait=wait_exponential(), stop=stop_after_attempt(7))
+    @retry(
+        retry=retry_if_exception_type(HTTPError),
+        wait=wait_exponential(),
+        stop=stop_after_attempt(7),
+    )
     def _authenticate(self):
         """
         Retrieves a Bearer token for the inofficial Spotify API, valid 1 hour.
@@ -90,6 +105,11 @@ class SpotifyConnector:
         https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
         (with a few exceptions)
         """
+        if self._auth_poisoned:
+            raise CredentialsExpired(
+                "Authentication has failed, not retrying. "
+                "Check credentials and try again."
+            )
 
         with self._auth_lock:
             logger.info("Retrieving Bearer")
@@ -135,11 +155,27 @@ class SpotifyConnector:
                 },
                 timeout=60,
             )
-            logger.trace("response - {}", response)
+            logger.trace("response - {}", response.text)
+
+            # Raise an exception if we get a 4xx or 5xx response
             response.raise_for_status()
 
             # We get some weird HTML here that contains some JS
             html = response.text
+
+            logger.trace("html = {}", html)
+
+            # At this point, we should have an HTTP response,
+            # but it could be an error page, containing an error message like
+            # response: {
+            #   "error": "login_required",
+            #   "state": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+            # }
+            # Check for this error case and raise an exception if we find it
+            # to avoid getting stuck in a loop
+            if "login_required" in html:
+                self._auth_poisoned = True
+                raise CredentialsExpired("Login required (credentials cookie expired?)")
 
             match = re.search(r"const authorizationResponse = (.*?);", html, re.DOTALL)
             json_str = match.group(1)

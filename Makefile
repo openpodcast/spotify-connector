@@ -15,6 +15,12 @@ publish: clean
 	pipenv run python setup.py sdist bdist_wheel
 	twine upload --username mre0 dist/*
 
+.PHONY: lint
+lint: ## run lint
+	pipenv run black spotifyconnector
+	pipenv run flake8 spotifyconnector
+	pipenv run pylint $$(git ls-files '*.py')
+
 .PHONY: init
 init:
 	pipenv install --dev
