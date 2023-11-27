@@ -65,6 +65,21 @@ performance = connector.performance("episode_id")
 
 See `__main.py__` for all endpoints.
 
+## Local Testing
+
+You can run the script locally to test it:
+
+```sh
+make dev
+```
+
+To run the script with verbose logging:
+
+```sh
+export LOGURU_LEVEL=TRACE
+make dev
+```
+
 ## Development
 
 We use [Pipenv] for virtualenv and dev dependency management. With Pipenv
