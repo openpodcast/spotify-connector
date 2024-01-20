@@ -23,5 +23,5 @@ setup(
             "spotifyconnector = spotifyconnector.__main__:main",
         ]
     },
-    install_requires=["requests", "loguru", "PyYAML", "tenacity"],
+    install_requires=["requests", "loguru", "PyYAML", "tenacity", "myst_parser[docs]"],
 )
