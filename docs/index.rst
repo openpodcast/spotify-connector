@@ -1,10 +1,10 @@
 Spotify Connector
 =================
 
-.. mdinclude:: ../README.md
+.. include:: ../README.md
 
 API
 ===
 
-.. autodoc:: spotifyconnector
+.. automodule:: spotifyconnector
    :members:
