@@ -26,6 +26,8 @@ import yaml
 
 DELAY_BASE = 2.0
 MAX_REQUEST_ATTEMPTS = 6
+# The Spotify API imposes exactly 29 days of data for "total" and "faceted" impressions
+IMPRESSIONS_DAYS_DIFF = 29
 
 
 class CredentialsExpired(Exception):
@@ -397,6 +399,68 @@ class SpotifyConnector:
             "shows",
             self.podcast_id,
             "followers",
+        )
+        return self._request(url, params=self._date_params(start, end))
+
+    def _set_impression_date_range(self, kind: str, start: dt.date, end: dt.date):
+        """
+        The following conditions must hold for impression data:
+        - If kind is "total" or "faceted", start and end must be exactly
+          IMPRESSIONS_DAYS_DIFF days apart.
+          We override the date range if this is not the case.
+        - Otherwise, end may not be before start.
+
+        Returns the new start and end dates.
+        Logs a warning if the dates were invalid.
+        """
+        if kind in ("total", "faceted"):
+            new_end = start + dt.timedelta(days=IMPRESSIONS_DAYS_DIFF)
+            if new_end != end:
+                logger.warning(
+                    f"kind is {kind}, overriding end date to be "
+                    f"{IMPRESSIONS_DAYS_DIFF} days after start date ({start}). "
+                    f"New end date: {new_end}"
+                )
+            return start, new_end
+
+        if end < start:
+            logger.warning(
+                f"End date {end} is before start date {start}, "
+                "setting end date to start date."
+            )
+            end = start
+        return start, end
+
+    def impressions(
+        self,
+        kind: str = "total",
+        start: Optional[dt.date] = None,
+        end: Optional[dt.date] = None,
+    ) -> dict:
+        """Loads podcast impression data.
+
+        Args:
+            kind (str): Range of data to request. Can be "total", "daily", or "faceted".
+            start (dt.date): Earliest date to request data for.
+            end (Optional[dt.date], optional): Most recent date to request data for.
+              Defaults to None. Will be set to `start` if None.
+
+        Returns:
+            dict: [description]
+        """
+
+        initial_start = start or dt.date.today() - dt.timedelta(
+            days=IMPRESSIONS_DAYS_DIFF
+        )
+        initial_end = end or start + dt.timedelta(days=IMPRESSIONS_DAYS_DIFF)
+        start, end = self._set_impression_date_range(kind, initial_start, initial_end)
+        logger.info(f"kind = {kind}, start = {start}, end = {end}")
+
+        url = self._build_url(
+            "shows",
+            self.podcast_id,
+            "impressions",
+            kind,
         )
         return self._request(url, params=self._date_params(start, end))
 
