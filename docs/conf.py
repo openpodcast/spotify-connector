@@ -8,12 +8,12 @@ release = "0.8.1"
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'myst_parser',
+    'myst_parser',  # enable markdown
 ]
 
 templates_path = ['_templates']
 
-source_suffix = ['.md']
+source_suffix = ['.rst', '.md']
 
 master_doc = 'index'
 
