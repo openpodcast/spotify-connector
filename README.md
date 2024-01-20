@@ -1,5 +1,7 @@
 # Spotify Connector
 
+[![Docs](https://readthedocs.org/projects/spotify-connector/badge?version=latest)](https://spotify-connector.readthedocs.io)
+
 This is a simple library for connecting to the unofficial Spotify podcast API.  
 It can be used to export data from your dashboard at
 https://podcasters.spotify.com/home.
