@@ -36,7 +36,7 @@ class CredentialsExpired(Exception):
     """
 
 
-def random_string(
+def _random_string(
     length: int,
     chars: str = string.ascii_lowercase + string.ascii_uppercase + string.digits,
 ) -> str:
@@ -114,9 +114,9 @@ class SpotifyConnector:
 
             logger.debug("Generating secrets")
 
-            state = random_string(32)
+            state = _random_string(32)
 
-            code_verifier = random_string(64)
+            code_verifier = _random_string(64)
             code_challenge = base64.b64encode(
                 hashlib.sha256(code_verifier.encode("utf-8")).digest()
             ).decode("utf-8")
