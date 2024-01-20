@@ -29,8 +29,7 @@ MAX_REQUEST_ATTEMPTS = 6
 
 
 class CredentialsExpired(Exception):
-    """
-    CredentialsExpired is raised when the Spotify API asks for a login
+    """CredentialsExpired is raised when the Spotify API asks for a login
     This is usually because the cookies have expired.
     """
 
@@ -39,9 +38,7 @@ def random_string(
     length: int,
     chars: str = string.ascii_lowercase + string.ascii_uppercase + string.digits,
 ) -> str:
-    """
-    Simple helper function to generate random strings suitable for use with Spotify
-    """
+    """Simple helper function to generate random strings suitable for use with Spotify"""
     return "".join(random.choices(chars, k=length))
 
 
@@ -98,8 +95,7 @@ class SpotifyConnector:
         stop=stop_after_attempt(7),
     )
     def _authenticate(self):
-        """
-        Retrieves a Bearer token for the inofficial Spotify API, valid 1 hour.
+        """Retrieves a Bearer token for the inofficial Spotify API, valid 1 hour.
 
         Generally follows the steps outlined here:
         https://developer.spotify.com/documentation/general/guides/authorization/code-flow/
