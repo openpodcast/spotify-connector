@@ -2,7 +2,7 @@
 
 [![Docs](https://readthedocs.org/projects/spotify-connector/badge?version=latest)](https://spotify-connector.readthedocs.io)
 
-![OpenPodcast Banner](https://raw.githubusercontent.com/openpodcast/banner/main/openpodcast-banner.png)
+[![OpenPodcast Banner](https://raw.githubusercontent.com/openpodcast/banner/main/openpodcast-banner.png)](https://openpodcast.app/)
 
 This is a simple library for connecting to the unofficial Spotify podcast API.  
 It can be used to export data from your dashboard at
