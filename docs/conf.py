@@ -2,8 +2,8 @@ project = 'spotify-connector'
 copyright = '2024, OpenPodcast'
 author = 'OpenPodcast'
 
-version = "0.8.1"
-release = "0.8.1"
+version = "0.8.2"
+release = "0.8.2"
 
 extensions = [
     'sphinx.ext.autodoc',
