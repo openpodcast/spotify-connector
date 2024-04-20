@@ -12,7 +12,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 setup(
     name="spotifyconnector",
     packages=find_packages(include=["spotifyconnector"]),
-    version="0.8.1",
+    version="0.8.2",
     description="Spotify Connector for Podcast Data",
     long_description=long_description,
     long_description_content_type="text/markdown",
