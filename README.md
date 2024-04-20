@@ -24,7 +24,7 @@ https://podcasters.spotify.com/home.
 Before you can use the library, you must extract your Spotify credentials from the dashboard;
 they are **not** exposed through your Spotify settings.
 
-You can use our [web-extension](https://github.com/openpodcast/web-extension) for that
+You can use our [web extension](https://github.com/openpodcast/web-extension) for that
 or [take a look at the code](https://github.com/openpodcast/web-extension/blob/7ce0865d22bea34fcfc53eec06b25cd076aa8034/src/openpodcast.js)
 to see how to do it manually.
 
@@ -89,7 +89,7 @@ make dev
 We use [Pipenv] for virtualenv and dev dependency management. With Pipenv
 installed:
 
-1. Install your locally checked out code in [development mode], including its
+1. Install your locally checked-out code in [development mode], including its
    dependencies, and all dev dependencies into a virtual environment:
 
 ```sh
