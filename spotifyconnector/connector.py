@@ -40,7 +40,10 @@ def _random_string(
     length: int,
     chars: str = string.ascii_lowercase + string.ascii_uppercase + string.digits,
 ) -> str:
-    """Simple helper function to generate random strings suitable for use with Spotify"""
+    """
+    Simple helper function to generate random strings
+    suitable for use with Spotify
+    """
     return "".join(random.choices(chars, k=length))
 
 
@@ -554,8 +557,7 @@ class SpotifyConnector:
                     },
                 },
             )
-            for episode in response["episodes"]:
-                yield episode
+            yield from response["episodes"]
 
             if page == response["totalPages"]:
                 break
