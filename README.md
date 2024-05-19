@@ -45,7 +45,7 @@ connector = SpotifyConnector(
     client_id="your_client_id", #login to spotify and monitor connection to get the id
     podcast_id="your_spotify_podcast_id",
     sp_dc="xxxxxxxxxxxxxxxxxx", #can be found in cookies after logged in
-    sp_ke="xxxxxxxxxxxxxxxxxx" #can be found in cookies after logged in
+    sp_key="xxxxxxxxxxxxxxxxxx" #can be found in cookies after logged in
 )
 
 # Get podcast metadata
