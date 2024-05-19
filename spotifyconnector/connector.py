@@ -557,8 +557,7 @@ class SpotifyConnector:
                     },
                 },
             )
-            for episode in response["episodes"]:
-                yield episode
+            yield from response["episodes"]
 
             if page == response["totalPages"]:
                 break
