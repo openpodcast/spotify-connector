@@ -19,7 +19,7 @@ publish: clean
 lint: ## run lint
 	pipenv run black spotifyconnector
 	pipenv run flake8 spotifyconnector
-	pipenv run pylint $$(git ls-files '*.py')
+	pipenv run pylint $$(git ls-files '*.py') --rcfile=./pylintrc
 
 .PHONY: init
 init:

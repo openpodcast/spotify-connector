@@ -40,7 +40,10 @@ def _random_string(
     length: int,
     chars: str = string.ascii_lowercase + string.ascii_uppercase + string.digits,
 ) -> str:
-    """Simple helper function to generate random strings suitable for use with Spotify"""
+    """
+    Simple helper function to generate random strings
+    suitable for use with Spotify
+    """
     return "".join(random.choices(chars, k=length))
 
 

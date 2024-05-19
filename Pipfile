@@ -8,8 +8,12 @@ spotifyconnector = {editable = true, path = "."}
 requests = "2.31.0"
 loguru = "0.7.0"
 wheel = "*"
+black = "*"
 
 [dev-packages]
+setuptools = "*"
+flake8 = "*"
+pylint = "*"
 
 [requires]
 python_version = "3"

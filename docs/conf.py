@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 project = 'spotify-connector'
 copyright = '2024, OpenPodcast'
 author = 'OpenPodcast'
