@@ -41,10 +41,11 @@ from spotifyconnector import SpotifyConnector
 
 # Set up the connector
 connector = SpotifyConnector(
-    client_id="your_client_id",
-    client_secret="your_client_secret",
-    redirect_uri="your_redirect_uri",
-    refresh_token="your_refresh_token",
+    base_url="https://generic.wg.spotify.com/podcasters/v0123"
+    client_id="your_client_id", #login to spotify and monitor connection to get the id
+    podcast_id="your_spotify_podcast_id",
+    sp_dc="xxxxxxxxxxxxxxxxxx", #can be found in cookies after logged in
+    sp_ke="xxxxxxxxxxxxxxxxxx" #can be found in cookies after logged in
 )
 
 # Get podcast metadata
