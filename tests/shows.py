@@ -1,4 +1,4 @@
-# flake8: noqa: C0114, R0801
+# flake8: noqa
 import os
 from spotifyconnector import SpotifyConnector
 
