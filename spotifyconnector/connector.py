@@ -442,7 +442,7 @@ class SpotifyConnector:
     ) -> dict:
         """Loads podcast impression data.
 
-        Faceted ignores the given date range and always return the last 30 days.
+        Faceted information is always aggregated over 30 days, so the date range has to be set accordingly.
 
         Args:
             kind (str): Range of data to request. Can be "total", "daily", or "faceted".
