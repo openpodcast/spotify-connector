@@ -24,7 +24,3 @@ lint: ## run lint
 .PHONY: init
 init: ## init virtual pyhton env
 	pipenv install --dev
-
-.PHONY: shows
-shows: ## list all shows of podcast defined in environment
-	pipenv run python tests/shows.py
