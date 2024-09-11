@@ -24,3 +24,7 @@ lint: ## run lint
 .PHONY: init
 init:
 	pipenv install --dev
+
+.PHONY: shows
+shows:
+	pipenv run python tests/shows.py
