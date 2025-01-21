@@ -608,3 +608,13 @@ class SpotifyConnector:
             "performance",
         )
         return self._request(url)
+
+    def me(self) -> dict:
+        """Gets the user data for the current user.
+
+        Returns:
+            dict: [me]
+        """
+
+        url = self._build_url("user", "me")
+        return self._request(url)
