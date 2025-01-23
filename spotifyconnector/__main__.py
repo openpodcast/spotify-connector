@@ -43,7 +43,7 @@ def log_status(endpoint_name, status, data):
     Log the status of an endpoint
     """
     symbol = "✓" if status else "✗"
-    logger.info(f"{symbol} {endpoint_name}: {json.dumps(data, separators=(',', ':'))}")
+    logger.info(f"{symbol} {endpoint_name}: {json.dumps(data, indent=2)}")
 
 
 def main():  # pylint: disable=too-many-locals
@@ -66,6 +66,7 @@ def main():  # pylint: disable=too-many-locals
 
     if not connector.podcast_id:
         execute_and_log("catalog", connector.catalog)
+        execute_and_log("user", connector.me)
         return
 
     execute_and_log("metadata", connector.metadata)
