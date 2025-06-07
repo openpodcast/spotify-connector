@@ -13,7 +13,7 @@ clean: ## clean build files
 .PHONY: publish
 publish: clean ## publish package to pypi
 	pipenv run python setup.py sdist bdist_wheel
-	twine upload --username mre0 dist/*
+	twine upload --username __token__ dist/*
 
 .PHONY: lint
 lint: ## run lint
