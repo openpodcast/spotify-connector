@@ -7,3 +7,9 @@ envs
 dist
 __pycache__
 build/
+
+# Coverage files
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml

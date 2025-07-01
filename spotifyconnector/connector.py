@@ -6,23 +6,24 @@ manually by logging in with the appropriate user at podcasters.spotify.com.
 Cookies supposedly last 1 year.
 """
 
-import random
-import string
 import base64
-import hashlib
-import re
-from typing import Dict, Optional
 import datetime as dt
-from time import sleep
+import hashlib
+import random
+import re
+import string
 from threading import RLock
-from loguru import logger
+from time import sleep
+from typing import Dict, Optional
+
 import requests
+import yaml
+from loguru import logger
 from requests.exceptions import HTTPError
 from tenacity import retry
+from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
-from tenacity.retry import retry_if_exception_type
-import yaml
 
 DELAY_BASE = 2.0
 MAX_REQUEST_ATTEMPTS = 6
@@ -95,7 +96,13 @@ class SpotifyConnector:
         self._auth_poisoned = False
 
     @retry(
-        retry=retry_if_exception_type(HTTPError),
+        retry=retry_if_exception_type(
+            (
+                HTTPError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+            )
+        ),
         wait=wait_exponential(),
         stop=stop_after_attempt(7),
     )
@@ -242,46 +249,79 @@ class SpotifyConnector:
         delay = DELAY_BASE
 
         last_status_code = None
+        last_exception = None
+
         for attempt in range(MAX_REQUEST_ATTEMPTS):
-            self._ensure_auth()
+            try:
+                # Only try to authenticate if we haven't had network errors recently
+                if attempt == 0 or last_exception is None:
+                    self._ensure_auth()
 
-            # Create request object with requests and trace it before sending
-            request = requests.Request(
-                "GET",
-                url,
-                params=params,
-                headers={"Authorization": f"Bearer {self._bearer}"},
-            )
-            prepared_request = request.prepare()
-            logger.trace("request - {}", prepared_request.url)
-            response = requests.Session().send(prepared_request)
+                # Create request object with requests and trace it before sending
+                request = requests.Request(
+                    "GET",
+                    url,
+                    params=params,
+                    headers={"Authorization": f"Bearer {self._bearer}"},
+                )
+                prepared_request = request.prepare()
+                logger.trace("request - {}", prepared_request.url)
+                response = requests.Session().send(prepared_request)
 
-            if response.status_code in (429, 502, 503, 504):
+                if response.status_code in (429, 502, 503, 504):
+                    last_status_code = response.status_code
+                    delay *= 2
+                    logger.log(
+                        ("INFO" if attempt < 3 else "WARNING"),
+                        'Got {} for URL "{}", next delay: {}s',
+                        response.status_code,
+                        url,
+                        delay,
+                    )
+                    sleep(delay)
+                    continue
+
+                if response.status_code == 401:
+                    last_status_code = response.status_code
+                    self._authenticate()
+                    continue
+
+                if not response.ok:
+                    last_status_code = response.status_code
+                    logger.error("Error in API:")
+                    logger.info(response.status_code)
+                    logger.info(response.headers)
+                    logger.info(response.text)
+                    response.raise_for_status()
+
+                logger.trace("response = {}", response.text)
+                return response.json()
+
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+                requests.exceptions.RequestException,
+            ) as e:
+                last_exception = e
                 delay *= 2
                 logger.log(
                     ("INFO" if attempt < 3 else "WARNING"),
-                    'Got {} for URL "{}", next delay: {}s',
-                    response.status_code,
+                    'Network error for URL "{}": {} (attempt {}/{}), next delay: {}s',
                     url,
+                    str(e),
+                    attempt + 1,
+                    MAX_REQUEST_ATTEMPTS,
                     delay,
                 )
-                sleep(delay)
+                if (
+                    attempt < MAX_REQUEST_ATTEMPTS - 1
+                ):  # Don't sleep on the last attempt
+                    sleep(delay)
                 continue
 
-            if response.status_code == 401:
-                self._authenticate()
-                continue
-
-            if not response.ok:
-                logger.error("Error in API:")
-                logger.info(response.status_code)
-                logger.info(response.headers)
-                logger.info(response.text)
-                response.raise_for_status()
-
-            logger.trace("response = {}", response.text)
-            return response.json()
-
+        # If we get here, all retries failed
+        if last_exception:
+            raise last_exception
         raise MaxRetriesException(url, last_status_code, MAX_REQUEST_ATTEMPTS)
 
     def metadata(self, episode=None) -> dict:
