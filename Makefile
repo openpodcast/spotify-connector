@@ -6,9 +6,52 @@ help: ## help message, list all command
 dev: ## run connector
 	pipenv run spotifyconnector
 
+.PHONY: test
+test: ## run all tests
+	python -m pytest tests/
+
+.PHONY: test-verbose
+test-verbose: ## run tests with verbose output
+	python -m pytest tests/ -v
+
+.PHONY: test-fast
+test-fast: ## run tests excluding slow ones
+	python -m pytest tests/ -m "not slow"
+
+.PHONY: test-connection
+test-connection: ## run only connection handling tests
+	python -m pytest tests/test_connection_handling.py -v
+
+.PHONY: ci-test
+ci-test: ## run tests as in CI environment
+	python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
+
+.PHONY: ci-lint
+ci-lint: ## run linting as in CI environment
+	black --check --diff spotifyconnector/
+	isort --check-only --diff spotifyconnector/
+	flake8 spotifyconnector/ --max-line-length=88 --extend-ignore=E203,W503
+	pylint spotifyconnector/ --rcfile=./pylintrc
+
+.PHONY: ci-security
+ci-security: ## run security checks as in CI environment
+	pip install safety bandit
+	safety check --short-report
+	bandit -r spotifyconnector/
+
+.PHONY: format
+format: ## format code with black and isort
+	black spotifyconnector/ tests/
+	isort spotifyconnector/ tests/
+
 .PHONY: clean
 clean: ## clean build files
 	rm -rf build dist *.egg-info
+	rm -rf .pytest_cache/
+	rm -rf htmlcov/
+	rm -rf .coverage
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
 
 .PHONY: publish
 publish: clean ## publish package to pypi

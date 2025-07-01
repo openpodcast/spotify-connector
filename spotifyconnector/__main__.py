@@ -2,9 +2,9 @@
 Command line interface to run the Spotify Connector
 """
 
+import datetime as dt
 import json
 import os
-import datetime as dt
 
 from loguru import logger
 

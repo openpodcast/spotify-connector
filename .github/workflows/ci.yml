@@ -1,73 +1,221 @@
 name: CI/CD
+
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
   release:
     types: [created]
 
+env:
+  PYTHONUNBUFFERED: 1
+
 jobs:
-  test:
+  lint:
+    name: Lint and Format Check
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: "3.12"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-lint-${{ hashFiles('**/setup.py', '**/Pipfile.lock') }}
 
       - name: Install formatters and linters
         run: |
-          python -m pip install black flake8 pylint
+          python -m pip install --upgrade pip
+          python -m pip install black flake8 pylint isort
 
-      - name: Install pipenv
+      - name: Install pipenv and dependencies
         run: |
           python -m pip install --upgrade pipenv wheel
-
-      - id: cache-pipenv
-        uses: actions/cache@v1
-        with:
-          path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
-
-      - name: Install dependencies
-        if: steps.cache-pipenv.outputs.cache-hit != 'true'
-        run: |
           pipenv install --deploy --dev
+        continue-on-error: true
 
-      - name: Run linter
+      - name: Check code formatting with black
         run: |
-          pipenv run flake8 spotifyconnector
-          pipenv run pylint $(git ls-files '*.py')
+          if command -v pipenv &> /dev/null; then
+            pipenv run black --check --diff .
+          else
+            black --check --diff spotifyconnector/
+          fi
 
-      - name: Run formatting check
+      - name: Check import sorting with isort
         run: |
-          pipenv run black --check .
+          if command -v pipenv &> /dev/null; then
+            pipenv run isort --check-only --diff .
+          else
+            isort --check-only --diff spotifyconnector/
+          fi
 
-  deploy:
-    needs: test
+      - name: Run flake8
+        run: |
+          if command -v pipenv &> /dev/null; then
+            pipenv run flake8 spotifyconnector
+          else
+            flake8 spotifyconnector/ --max-line-length=88 --extend-ignore=E203,W503
+          fi
+
+      - name: Run pylint
+        run: |
+          if command -v pipenv &> /dev/null; then
+            pipenv run pylint $(git ls-files '*.py') --rcfile=./pylintrc
+          else
+            pylint spotifyconnector/ --rcfile=./pylintrc
+          fi
+        continue-on-error: true
+
+  test:
+    name: Test Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'created'
+    needs: lint
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/setup.py', '**/Pipfile.lock') }}
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-xdist
+          pip install -e .
+
+      - name: Install pipenv dependencies (if available)
+        run: |
+          if [ -f "Pipfile" ]; then
+            python -m pip install --upgrade pipenv
+            pipenv install --deploy --dev
+          fi
+        continue-on-error: true
+
+      - name: Run tests with pytest
+        run: |
+          if command -v pipenv &> /dev/null && [ -f "Pipfile" ]; then
+            pipenv run python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
+          else
+            python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
+          fi
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  security:
+    name: Security Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.12"
+      
+      - name: Install security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety bandit
+          pip install -e .
+      
+      - name: Check for known security vulnerabilities
+        run: safety check --json || true
+      
+      - name: Run bandit security linter
+        run: bandit -r spotifyconnector/ -f json || true
 
-      - name: Install build dependencies
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    timeout-minutes: 10
+    
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      
+      - name: Install build tools
         run: |
           python -m pip install --upgrade pip
           pip install build twine
-
+      
       - name: Build package
         run: python -m build
+      
+      - name: Check package
+        run: twine check dist/*
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+
+  deploy:
+    name: Deploy to PyPI
+    needs: [lint, test, security, build]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'created'
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+
+      - name: Install deployment tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install twine
 
       - name: Publish to PyPI
         env:

@@ -1,0 +1,79 @@
+name: Security
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety bandit semgrep
+        pip install -e .
+
+    - name: Install dependencies for scanning
+      run: |
+        if [ -f "Pipfile" ]; then
+          pip install pipenv
+          pipenv requirements > requirements.txt
+          pip install -r requirements.txt
+        fi
+      continue-on-error: true
+
+    - name: Run Safety check for known vulnerabilities
+      run: |
+        safety check --json --output safety-report.json || true
+        safety check --short-report || true
+
+    - name: Run Bandit security linter
+      run: |
+        bandit -r spotifyconnector/ -f json -o bandit-report.json || true
+        bandit -r spotifyconnector/ || true
+
+    - name: Run Semgrep security scanner
+      run: |
+        semgrep --config=auto spotifyconnector/ --json --output=semgrep-report.json || true
+        semgrep --config=auto spotifyconnector/ || true
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+          semgrep-report.json
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v4
+      
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v3
+      with:
+        fail-on-severity: moderate
