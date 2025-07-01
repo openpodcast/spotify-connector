@@ -12,8 +12,11 @@ import pytest
 import requests
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 
-from spotifyconnector.connector import (CredentialsExpired,
-                                        MaxRetriesException, SpotifyConnector)
+from spotifyconnector.connector import (
+    CredentialsExpired,
+    MaxRetriesException,
+    SpotifyConnector,
+)
 
 
 class TestConnectionHandling:

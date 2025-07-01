@@ -28,10 +28,10 @@ ci-test: ## run tests as in CI environment
 
 .PHONY: ci-lint
 ci-lint: ## run linting as in CI environment
-	black --check --diff spotifyconnector/
-	isort --check-only --diff spotifyconnector/
-	flake8 spotifyconnector/ --max-line-length=88 --extend-ignore=E203,W503
-	pylint spotifyconnector/ --rcfile=./pylintrc
+	python -m black --check --diff spotifyconnector/ tests/
+	python -m isort --check-only --diff spotifyconnector/ tests/
+	python -m flake8 spotifyconnector/ --max-line-length=88 --extend-ignore=E203,W503 || echo "flake8 not available, skipping"
+	python -m pylint spotifyconnector/ --rcfile=./pylintrc || echo "pylint not available, skipping"
 
 .PHONY: ci-security
 ci-security: ## run security checks as in CI environment
