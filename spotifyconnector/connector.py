@@ -200,9 +200,13 @@ class SpotifyConnector:
 
             # Confirm that auth was successful
             if auth_response["type"] != "authorization_response":
-                raise AuthenticationError(f"Expected authorization_response, got {auth_response['type']}")
+                raise AuthenticationError(
+                    f"Expected authorization_response, got {auth_response['type']}"
+                )
             if auth_response["response"]["state"] != state:
-                raise AuthenticationError("State parameter mismatch in authentication response")
+                raise AuthenticationError(
+                    "State parameter mismatch in authentication response"
+                )
 
             auth_code = auth_response["response"]["code"]
 
