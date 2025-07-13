@@ -9,8 +9,8 @@ Cookies supposedly last 1 year.
 import base64
 import datetime as dt
 import hashlib
-import random
 import re
+import secrets
 import string
 from threading import RLock
 from time import sleep
@@ -45,12 +45,18 @@ def _random_string(
     Simple helper function to generate random strings
     suitable for use with Spotify
     """
-    return "".join(random.choices(chars, k=length))
+    return "".join(secrets.choice(chars) for _ in range(length))
 
 
 class MaxRetriesException(Exception):
     """
     Raised when the maximum number of retries is reached
+    """
+
+
+class AuthenticationError(Exception):
+    """
+    Raised when authentication fails or returns unexpected response
     """
 
     def __init__(self, url, last_status_code, attempts):
@@ -193,8 +199,10 @@ class SpotifyConnector:
             auth_response = yaml.safe_load(json_str)
 
             # Confirm that auth was successful
-            assert auth_response["type"] == "authorization_response"
-            assert auth_response["response"]["state"] == state
+            if auth_response["type"] != "authorization_response":
+                raise AuthenticationError(f"Expected authorization_response, got {auth_response['type']}")
+            if auth_response["response"]["state"] != state:
+                raise AuthenticationError("State parameter mismatch in authentication response")
 
             auth_code = auth_response["response"]["code"]
 
