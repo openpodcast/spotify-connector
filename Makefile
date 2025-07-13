@@ -6,9 +6,28 @@ help: ## help message, list all command
 dev: ## run connector
 	pipenv run spotifyconnector
 
+.PHONY: test
+test: ## run all tests
+	python -m pytest tests/
+
+.PHONY: test-verbose
+test-verbose: ## run tests with verbose output
+	python -m pytest tests/ -v
+
+.PHONY: test-fast
+test-fast: ## run tests excluding slow ones
+	python -m pytest tests/ -m "not slow"
+
+.PHONY: test-connection
+test-connection: ## run only connection handling tests
+	python -m pytest tests/test_connection_handling.py -v
+
 .PHONY: clean
 clean: ## clean build files
 	rm -rf build dist *.egg-info
+	rm -rf .pytest_cache/
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
 
 .PHONY: publish
 publish: clean ## publish package to pypi

@@ -12,8 +12,9 @@ black = "*"
 
 [dev-packages]
 setuptools = "*"
-flake8 = "*"
-pylint = "*"
+pytest = "*"
+black = "*"
+isort = "*"
 
 [requires]
 python_version = "3"
