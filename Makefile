@@ -26,8 +26,6 @@ test-connection: ## run only connection handling tests
 clean: ## clean build files
 	rm -rf build dist *.egg-info
 	rm -rf .pytest_cache/
-	rm -rf htmlcov/
-	rm -rf .coverage
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 
