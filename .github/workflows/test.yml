@@ -10,40 +10,6 @@ env:
   PYTHONUNBUFFERED: 1
 
 jobs:
-  quick-check:
-    name: Quick Smoke Test
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-    - name: Check out repository code
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-
-    - name: Cache pip dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-quick-${{ hashFiles('**/setup.py', '**/Pipfile.lock') }}
-
-    - name: Install minimal dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-        pip install -e .
-
-    - name: Test package import
-      run: |
-        python -c "import spotifyconnector; print('✅ Package imports successfully')"
-
-    - name: Run critical connection test
-      run: |
-        python -m pytest tests/test_connection_handling.py::TestConnectionHandling::test_connection_error_retries_and_fails -v --tb=short
-
   test:
     name: Test Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
