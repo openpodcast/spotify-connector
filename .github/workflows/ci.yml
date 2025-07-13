@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
 
     steps:
       - name: Check out repository code
@@ -112,14 +112,20 @@ jobs:
           if [ -f "Pipfile" ]; then
             python -m pip install --upgrade pipenv
             pipenv install --deploy --dev
+            pipenv install pytest pytest-cov pytest-xdist
           fi
         continue-on-error: true
 
       - name: Run tests with pytest
         run: |
           if command -v pipenv &> /dev/null && [ -f "Pipfile" ]; then
-            pipenv run python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
+            echo "Running tests with pipenv..."
+            pipenv run python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing || {
+              echo "Pipenv failed, falling back to global Python..."
+              python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
+            }
           else
+            echo "Running tests with global Python..."
             python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
           fi
 

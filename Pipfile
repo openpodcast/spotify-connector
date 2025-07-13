@@ -14,6 +14,9 @@ black = "*"
 setuptools = "*"
 flake8 = "*"
 pylint = "*"
+pytest = "*"
+pytest-xdist = "*"
+isort = "*"
 
 [requires]
 python_version = "3"
