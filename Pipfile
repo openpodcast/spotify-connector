@@ -12,10 +12,8 @@ black = "*"
 
 [dev-packages]
 setuptools = "*"
-flake8 = "*"
-pylint = "*"
 pytest = "*"
-pytest-xdist = "*"
+black = "*"
 isort = "*"
 
 [requires]

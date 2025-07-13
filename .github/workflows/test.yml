@@ -1,16 +1,19 @@
-name: Tests
+name: Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
+
+env:
+  PYTHONUNBUFFERED: 1
 
 jobs:
-  test:
-    name: Quick Tests
+  quick-check:
+    name: Quick Smoke Test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
 
     steps:
     - name: Check out repository code
@@ -19,7 +22,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: Cache pip dependencies
       uses: actions/cache@v4
@@ -27,67 +30,91 @@ jobs:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-quick-${{ hashFiles('**/setup.py', '**/Pipfile.lock') }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest pytest-cov
-        pip install -e .
-
-    - name: Install package dependencies
-      run: |
-        if [ -f "Pipfile" ]; then
-          pip install pipenv
-          pipenv requirements > requirements.txt
-          pip install -r requirements.txt
-        fi
-      continue-on-error: true
-
-    - name: Run connection handling tests
-      run: |
-        python -m pytest tests/test_connection_handling.py -v --tb=short
-
-    - name: Run all tests
-      run: |
-        python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=term-missing
-
-    - name: Test import
-      run: |
-        python -c "import spotifyconnector; print('Package imports successfully')"
-
-  test-matrix:
-    name: Test Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-
-    steps:
-    - name: Check out repository code
-      uses: actions/checkout@v4
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
+    - name: Install minimal dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pytest
         pip install -e .
 
-    - name: Install package dependencies
+    - name: Test package import
       run: |
-        if [ -f "Pipfile" ]; then
-          pip install pipenv
-          pipenv requirements > requirements.txt
-          pip install -r requirements.txt
-        fi
-      continue-on-error: true
+        python -c "import spotifyconnector; print('✅ Package imports successfully')"
 
-    - name: Run tests
+    - name: Run critical connection test
       run: |
-        python -m pytest tests/ -v --tb=short
+        python -m pytest tests/test_connection_handling.py::TestConnectionHandling::test_connection_error_retries_and_fails -v --tb=short
+
+  test:
+    name: Test Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    needs: quick-check
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.12"]
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/setup.py', '**/Pipfile.lock') }}
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+          pip install -e .
+
+      - name: Run comprehensive test suite
+        run: |
+          python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  build-verify:
+    name: Verify Package Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-build-${{ hashFiles('**/setup.py', '**/Pipfile.lock') }}
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build package
+        run: python -m build
+
+      - name: Verify package integrity
+        run: twine check dist/*

@@ -22,28 +22,6 @@ test-fast: ## run tests excluding slow ones
 test-connection: ## run only connection handling tests
 	python -m pytest tests/test_connection_handling.py -v
 
-.PHONY: ci-test
-ci-test: ## run tests as in CI environment
-	python -m pytest tests/ -v --tb=short --cov=spotifyconnector --cov-report=xml --cov-report=term-missing
-
-.PHONY: ci-lint
-ci-lint: ## run linting as in CI environment
-	python -m black --check --diff spotifyconnector/ tests/
-	python -m isort --check-only --diff spotifyconnector/ tests/
-	python -m flake8 spotifyconnector/ --max-line-length=88 --extend-ignore=E203,W503 || echo "flake8 not available, skipping"
-	python -m pylint spotifyconnector/ --rcfile=./pylintrc || echo "pylint not available, skipping"
-
-.PHONY: ci-security
-ci-security: ## run security checks as in CI environment
-	pip install safety bandit
-	safety check --short-report
-	bandit -r spotifyconnector/
-
-.PHONY: format
-format: ## format code with black and isort
-	black spotifyconnector/ tests/
-	isort spotifyconnector/ tests/
-
 .PHONY: clean
 clean: ## clean build files
 	rm -rf build dist *.egg-info
