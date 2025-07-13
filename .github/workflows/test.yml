@@ -13,7 +13,6 @@ jobs:
   test:
     name: Test Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    needs: quick-check
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -53,7 +52,7 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
-
+          
   build-verify:
     name: Verify Package Build
     runs-on: ubuntu-latest
@@ -83,4 +82,4 @@ jobs:
         run: python -m build
 
       - name: Verify package integrity
-        run: twine check dist/*
+        run: twine check dist/*          
