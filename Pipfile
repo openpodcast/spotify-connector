@@ -5,16 +5,19 @@ name = "pypi"
 
 [packages]
 spotifyconnector = {editable = true, path = "."}
-requests = "2.31.0"
 loguru = "0.7.0"
 wheel = "*"
 black = "*"
+requests = "*"
 
 [dev-packages]
 setuptools = "*"
 pytest = "*"
 black = "*"
 isort = "*"
+bandit = "*"
+safety = "*"
+semgrep = "*"
 
 [requires]
 python_version = "3"
