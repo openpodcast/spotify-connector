@@ -28,6 +28,17 @@ You can use our [web extension](https://github.com/openpodcast/web-extension) fo
 or [take a look at the code](https://github.com/openpodcast/web-extension/blob/7ce0865d22bea34fcfc53eec06b25cd076aa8034/src/openpodcast.js)
 to see how to do it manually.
 
+**You need three values:**
+
+- `sp_dc`: Can be found in the Spotify cookies once you're logged in. It's a
+  long string with around 160 characters.
+- `sp_key`: Can also be found in the Spotify cookies once you're logged in. It's
+  a UUID (36 characters). 
+- `client_id`: This is a static value and stays the same for everyone. It is
+  `05a1371ee5194c27860b3ff3ff3979d2`. Spotify might change it in the future, so
+  if you run into issues, please check your network requests while logged in to
+  find the new value.
+
 ## Installation
 
 ```
@@ -42,10 +53,10 @@ from spotifyconnector import SpotifyConnector
 # Set up the connector
 connector = SpotifyConnector(
     base_url="https://generic.wg.spotify.com/podcasters/v0123"
-    client_id="your_client_id", #login to spotify and monitor connection to get the id
+    client_id="05a1371ee5194c27860b3ff3ff3979d2", # login to spotify and monitor connection to get this id
     podcast_id="your_spotify_podcast_id",
-    sp_dc="xxxxxxxxxxxxxxxxxx", #can be found in cookies after logged in
-    sp_key="xxxxxxxxxxxxxxxxxx" #can be found in cookies after logged in
+    sp_dc="xxxxxxxxxxxxxxxxxx...xxx", # can be found in cookies after logged in (long string)
+    sp_key="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" # can be found in cookies after logged in
 )
 
 # Get podcast metadata
