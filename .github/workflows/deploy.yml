@@ -12,38 +12,30 @@ jobs:
     name: Deploy to PyPI
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: 
+    environment:
       name: pypi
       url: https://pypi.org/p/spotifyconnector
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-deploy-${{ hashFiles('**/setup.py', '**/Pipfile.lock') }}
-
-      - name: Install build and deployment tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install build twine
+        run: uv python install 3.12
 
       - name: Build package
-        run: python -m build
+        run: uv build
 
       - name: Verify package integrity
-        run: twine check dist/*
+        run: uv run --with twine twine check dist/*
 
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: twine upload dist/*
+        run: uv run --with twine twine upload dist/*

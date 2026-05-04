@@ -1,3 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "spotifyconnector"
+version = "0.8.3"
+description = "Spotify Connector for Podcast Data"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Open Podcast" },
+]
+dependencies = [
+    "requests",
+    "loguru",
+    "PyYAML",
+    "tenacity",
+]
+
+[project.optional-dependencies]
+docs = ["myst_parser"]
+
+[project.scripts]
+spotifyconnector = "spotifyconnector.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["spotifyconnector"]
+
+[dependency-groups]
+dev = [
+    "black",
+    "flake8",
+    "isort",
+    "pylint>=3.0.3",
+    "pytest",
+    "pytest-cov",
+    "build",
+    "twine",
+    "bandit",
+    "safety",
+    "semgrep",
+]
+
 [tool.pytest.ini_options]
 # Pytest configuration
 testpaths = ["tests"]
@@ -22,7 +67,7 @@ markers = [
 
 [tool.black]
 line-length = 88
-target-version = ['py39']
+target-version = ['py310']
 include = '\.pyi?$'
 extend-exclude = '''
 /(

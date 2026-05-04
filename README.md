@@ -98,14 +98,19 @@ make dev
 
 ## Development
 
-We use [Pipenv] for virtualenv and dev dependency management. With Pipenv
-installed:
+We use [uv] for virtualenv and dependency management. With uv [installed][uv-install]:
 
-1. Install your locally checked-out code in [development mode], including its
-   dependencies, and all dev dependencies into a virtual environment:
+1. Install your locally checked-out code in editable mode, including all
+   runtime, optional, and dev dependencies into a `.venv/` virtual environment:
 
 ```sh
-pipenv sync --dev
+uv sync --all-extras --group dev
+```
+
+   Or simply:
+
+```sh
+make install
 ```
 
 2. Create an environment file and fill in the required values:
@@ -114,44 +119,45 @@ pipenv sync --dev
 cp .env.example .env
 ```
 
-3. Run the script in the virtual environment, which will [automatically load
-   your `.env`][env]:
+3. Run the script in the virtual environment:
 
 ```sh
-pipenv run spotifyconnector
+uv run spotifyconnector
 ```
 
-To add a new dependency for use during the development of this library:
+To add a new runtime dependency:
 
 ```sh
-pipenv install --dev $package
+uv add $package
 ```
 
-To add a new dependency necessary for the correct operation of this library, add
-the package to the `install_requires` section of `./setup.py`, then:
+To add a new development-only dependency:
 
 ```sh
-pipenv install
+uv add --group dev $package
 ```
 
-To publish the package:
+To build the package locally (sdist + wheel into `dist/`):
 
 ```sh
-python setup.py sdist bdist_wheel
-twine upload dist/*
+uv build
 ```
 
-or
+## Releasing
 
-```sh
-make publish
-```
+Releases are published to PyPI automatically by GitHub Actions when a new
+GitHub release is created.
+
+1. Bump the `version` field in `pyproject.toml`.
+2. Commit the bump and open a PR; merge it once CI is green.
+3. Create a new GitHub release with a tag like `v0.8.3` matching the version
+   in `pyproject.toml`. The `Deploy` workflow will build with `uv build` and
+   publish via `twine` using the `PYPI_API_TOKEN` secret.
 
 ## Credits
 
 This was inspired by the code at [wdr-okr], extended and released to PyPi.
 
-[pipenv]: https://pipenv.pypa.io/en/latest/index.html#install-pipenv-today
-[development mode]: https://setuptools.pypa.io/en/latest/userguide/development_mode.html
-[env]: https://pipenv.pypa.io/en/latest/advanced/#automatic-loading-of-env
+[uv]: https://docs.astral.sh/uv/
+[uv-install]: https://docs.astral.sh/uv/getting-started/installation/
 [wdr-okr]: https://github.com/wdr-data/wdr-okr
